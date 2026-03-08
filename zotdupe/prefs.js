@@ -25,3 +25,6 @@ pref("extensions.zotdupe.enableCrossType", true);
 
 // Enable MinHash for large-library approximate matching
 pref("extensions.zotdupe.enableMinHash", false);
+
+// Non-duplicate excluded pairs (JSON array of "keyA:keyB" strings)
+pref("extensions.zotdupe.excludedPairs", "[]");

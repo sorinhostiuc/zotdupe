@@ -368,12 +368,16 @@ var ZotDupeResults = {
         if (!cluster) return;
 
         try {
-            // Mark all pairs in this cluster as non-duplicate
+            // Mark all pairs in this cluster as non-duplicate using item keys
             if (typeof ZotDupe !== 'undefined' && ZotDupe.markNonDuplicate) {
-                var ids = cluster.ids || [];
-                for (var i = 0; i < ids.length; i++) {
-                    for (var j = i + 1; j < ids.length; j++) {
-                        await ZotDupe.markNonDuplicate(ids[i], ids[j]);
+                var items = cluster.items || [];
+                var keys = [];
+                for (var k = 0; k < items.length; k++) {
+                    if (items[k].key) keys.push(items[k].key);
+                }
+                for (var i = 0; i < keys.length; i++) {
+                    for (var j = i + 1; j < keys.length; j++) {
+                        ZotDupe.markNonDuplicate(keys[i], keys[j]);
                     }
                 }
             }
