@@ -1,0 +1,254 @@
+/*
+ * ZotDupe — Config Dialog Stylesheet
+ *
+ * Colors from spec:
+ *   Background: #FFFFFF content, #F7F7F8 panels
+ *   Text: #1A1A1A primary, gray secondary
+ *   Accent: #5C6BC0
+ */
+
+/* ── Root ── */
+#zotdupe-config-root {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  color: #1A1A1A;
+  background: #FFFFFF;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+/* ── Header ── */
+#zotdupe-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #E0E0E0;
+}
+
+#zotdupe-header-logo {
+  flex-shrink: 0;
+}
+
+#zotdupe-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+#zotdupe-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #1A1A1A;
+}
+
+#zotdupe-subtitle {
+  font-size: 11px;
+  font-style: italic;
+  color: #888;
+}
+
+#zotdupe-version {
+  margin-left: auto;
+  font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+  font-size: 10px;
+  color: #AAA;
+  align-self: flex-start;
+  padding-top: 4px;
+}
+
+/* ── Sections ── */
+.zotdupe-section {
+  margin-bottom: 14px;
+}
+
+.zotdupe-section-label {
+  display: block;
+  font-size: 14px;
+  font-weight: bold;
+  color: #1A1A1A;
+  margin-bottom: 8px;
+}
+
+.zotdupe-section-label-inline {
+  display: inline;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* ── Radio group ── */
+.zotdupe-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-left: 4px;
+}
+
+.zotdupe-radio-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.zotdupe-radio-label input[type="radio"] {
+  margin: 0;
+  accent-color: #5C6BC0;
+}
+
+#zotdupe-collection-select {
+  margin-left: 4px;
+  padding: 3px 8px;
+  font-size: 12px;
+  border: 1px solid #CCC;
+  border-radius: 4px;
+  background: #FAFAFA;
+  max-width: 240px;
+  transition: outline 0.2s ease;
+}
+
+#zotdupe-collection-select:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Threshold slider ── */
+#zotdupe-threshold-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 4px 0;
+}
+
+.zotdupe-slider-label {
+  font-size: 11px;
+  color: #777;
+  min-width: 42px;
+  text-align: center;
+}
+
+#zotdupe-threshold-slider {
+  flex: 1;
+  height: 6px;
+  accent-color: #5C6BC0;
+  cursor: pointer;
+}
+
+#zotdupe-threshold-desc {
+  font-size: 11px;
+  color: #666;
+  margin-top: 6px;
+  padding-left: 4px;
+  font-style: italic;
+}
+
+/* ── Collapsible advanced ── */
+.zotdupe-collapsible-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+  padding: 2px 0;
+}
+
+#zotdupe-advanced-indicator {
+  font-size: 10px;
+  color: #888;
+  width: 14px;
+  text-align: center;
+  transition: transform 0.15s ease;
+}
+
+#zotdupe-advanced-body {
+  padding: 8px 4px 4px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  transition: max-height 0.2s ease, opacity 0.2s ease;
+  overflow: hidden;
+}
+
+#zotdupe-advanced-body.zotdupe-collapsed {
+  max-height: 0;
+  opacity: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.zotdupe-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.zotdupe-checkbox-label input[type="checkbox"] {
+  margin: 0;
+  accent-color: #5C6BC0;
+}
+
+/* ── Footer ── */
+#zotdupe-footer {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid #E0E0E0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#zotdupe-estimate {
+  font-size: 11px;
+  color: #999;
+}
+
+#zotdupe-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+/* Cancel button */
+#zotdupe-btn-cancel {
+  background: transparent;
+  border: 1px solid #CCC;
+  border-radius: 6px;
+  padding: 8px 24px;
+  font-size: 13px;
+  color: #555;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+#zotdupe-btn-cancel:hover {
+  background: #F0F0F0;
+}
+
+/* Scan button — primary */
+#zotdupe-btn-scan {
+  background: #5C6BC0;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 24px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+#zotdupe-btn-scan:hover {
+  background: #4a59b0;
+  box-shadow: 0 2px 8px rgba(92, 107, 192, 0.35);
+}
+
+#zotdupe-btn-scan:active {
+  background: #3f4e9e;
+}

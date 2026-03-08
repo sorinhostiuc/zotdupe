@@ -113,9 +113,11 @@ function onMainWindowLoad(win) {
   menuItem.id = "zotdupe-scan-menuitem";
   menuItem.setAttribute("data-l10n-id", "zotdupe-menu-label");
   menuItem.addEventListener("command", function () {
-    // TODO: Open the ZotDupe scan dialog
-    // e.g.: ZotDupe.openScanDialog(win);
-    win.alert("ZotDupe: Scan for Duplicates — coming soon.");
+    win.openDialog(
+      "chrome://zotdupe/content/src/ui/config-dialog.xhtml",
+      "zotdupe-config",
+      "chrome,centerscreen,resizable=no,width=560,height=420"
+    );
   });
 
   // Append to the Tools menu (menu_ToolsPopup)
