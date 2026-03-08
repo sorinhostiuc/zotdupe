@@ -223,27 +223,88 @@ var ZotDupeConfigDialog = {
       Zotero.Prefs.set(this._prefBranch + key, val, true);
     }
 
-    // Build config object to pass to the results panel
-    var config = {
-      scope: scope,
+    // Build scan options
+    var scanOptions = Object.assign({}, options, {
+      libraryID: Zotero.Libraries.userLibraryID,
       collectionID: collectionID,
-      threshold: thresholdValue,
-      thresholdName: thresholdName,
-      options: options,
+      threshold: thresholdName,
+    });
+
+    // Show progress UI and disable controls
+    var self = this;
+    this._showProgress();
+
+    // Wire up progress callback
+    scanOptions.onProgress = function (info) {
+      self._updateProgress(info);
     };
 
-    // Close this dialog
-    window.close();
+    try {
+      var result = await ZotDupe.scan(scanOptions);
 
-    // Open results panel and pass config via window arguments
-    var mainWindow = Zotero.getMainWindow();
-    if (mainWindow) {
-      mainWindow.openDialog(
-        "chrome://zotdupe/content/src/ui/results-panel.xhtml",
-        "zotdupe-results",
-        "chrome,centerscreen,resizable=yes,width=900,height=600",
-        config
-      );
+      // Build config object to pass to the results panel
+      var config = {
+        scope: scope,
+        collectionID: collectionID,
+        threshold: thresholdValue,
+        thresholdName: thresholdName,
+        options: options,
+        scanResult: result,
+      };
+
+      // Close this dialog
+      window.close();
+
+      // Open results panel and pass config via window arguments
+      var mainWindow = Zotero.getMainWindow();
+      if (mainWindow) {
+        mainWindow.openDialog(
+          "chrome://zotdupe/content/src/ui/results-panel.xhtml",
+          "zotdupe-results",
+          "chrome,centerscreen,resizable=yes,width=900,height=600",
+          config
+        );
+      }
+    } catch (e) {
+      Zotero.logError("[ZotDupe] Scan error: " + e);
+      this._hideProgress();
+    }
+  },
+
+  /**
+   * Show the progress overlay and disable scan controls.
+   */
+  _showProgress() {
+    document.getElementById("zotdupe-progress").style.display = "block";
+    document.getElementById("zotdupe-btn-scan").disabled = true;
+    document.getElementById("zotdupe-btn-cancel").disabled = true;
+    // Reset bar
+    document.getElementById("zotdupe-progress-bar-fill").style.width = "0%";
+    document.getElementById("zotdupe-progress-status").textContent = "Se scanează...";
+  },
+
+  /**
+   * Hide the progress overlay and re-enable controls.
+   */
+  _hideProgress() {
+    document.getElementById("zotdupe-progress").style.display = "none";
+    document.getElementById("zotdupe-btn-scan").disabled = false;
+    document.getElementById("zotdupe-btn-cancel").disabled = false;
+  },
+
+  /**
+   * Update the progress bar and status text.
+   * @param {{phase: string, message: string, progress: number}} info
+   */
+  _updateProgress(info) {
+    if (!info) return;
+    var statusEl = document.getElementById("zotdupe-progress-status");
+    var fillEl = document.getElementById("zotdupe-progress-bar-fill");
+    if (info.message) {
+      statusEl.textContent = info.message;
+    }
+    if (typeof info.progress === "number") {
+      fillEl.style.width = Math.round(info.progress * 100) + "%";
     }
   },
 

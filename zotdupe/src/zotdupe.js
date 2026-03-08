@@ -267,6 +267,22 @@ ZotDupe.isExcludedPair = function (keyA, keyB) {
     return excluded.indexOf(pairKey) !== -1;
 };
 
+/**
+ * Return a Set of all excluded pair keys from preferences.
+ *
+ * @returns {Set<string>}
+ */
+ZotDupe.getExcludedPairs = function () {
+    return new Set(_loadExcludedPairs());
+};
+
+/**
+ * Clear all excluded pairs (reset non-duplicate markings).
+ */
+ZotDupe.clearExcludedPairs = function () {
+    _saveExcludedPairs([]);
+};
+
 // Expose helper for testability without Zotero prefs
 ZotDupe._sortedPairKey = _sortedPairKey;
 
@@ -301,7 +317,7 @@ ZotDupe.isExcludedPairIn = function (keyA, keyB, excludedList) {
  * @param {boolean} [options.enableTranslationDetection=true]
  * @param {boolean} [options.enableCrossType=true]
  * @param {boolean} [options.enableMinHash=false]
- * @param {function} [options.onProgress] - callback(stage, detail)
+ * @param {function} [options.onProgress] - callback({phase, message, progress})
  * @returns {Promise<{clusters: Array, stats: object}>}
  */
 ZotDupe.scan = async function (options) {
@@ -311,7 +327,7 @@ ZotDupe.scan = async function (options) {
     var progress = opts.onProgress || function () {};
 
     // Step a: Get items
-    progress('loading', 'Fetching items from library...');
+    progress({phase: "indexing", message: "Se construiește indexul...", progress: 0});
     var zoteroItems;
     if (opts.collectionID) {
         var collection = Zotero.Collections.get(opts.collectionID);
@@ -325,7 +341,7 @@ ZotDupe.scan = async function (options) {
         return item.isRegularItem && item.isRegularItem();
     });
 
-    progress('converting', 'Converting ' + zoteroItems.length + ' items...');
+    progress({phase: "indexing", message: "Se convertesc " + zoteroItems.length + " itemi...", progress: 0.05});
 
     // Step b: Convert to plain objects
     var plainItems = [];
@@ -343,7 +359,7 @@ ZotDupe.scan = async function (options) {
     }
 
     // Step c: Build blocking index
-    progress('blocking', 'Building blocking index...');
+    progress({phase: "indexing", message: "Se construiește indexul de blocare...", progress: 0.1});
     var blocks = ZotDupe.Blocker.buildBlocks(plainItems);
 
     // Step d: Get candidate pairs from blocking
@@ -351,7 +367,7 @@ ZotDupe.scan = async function (options) {
 
     // Step d2: If MinHash enabled, add LSH candidates
     if (opts.enableMinHash && ZotDupe.MinHash) {
-        progress('minhash', 'Computing MinHash LSH candidates...');
+        progress({phase: "indexing", message: "Se calculează candidații MinHash LSH...", progress: 0.15});
         var lshPairs = ZotDupe.MinHash.lshCandidates(plainItems);
         // Merge LSH pairs into candidate set (deduplicate)
         var seen = {};
@@ -373,7 +389,8 @@ ZotDupe.scan = async function (options) {
     }
 
     // Step e-f: Scan and score each pair
-    progress('scanning', 'Scanning ' + candidatePairs.length + ' candidate pairs...');
+    var totalPairs = candidatePairs.length;
+    progress({phase: "scanning", message: "Se compară perechile: 0/" + totalPairs + "...", progress: 0.2});
     var thresholdValue = ZotDupe.Scorer.getThresholdValue(threshold);
     var scoredPairs = [];
 
@@ -412,15 +429,16 @@ ZotDupe.scan = async function (options) {
 
         // Progress every 500 pairs
         if (s % 500 === 0 && s > 0) {
-            progress('scanning', 'Scanned ' + s + ' / ' + candidatePairs.length + ' pairs...');
+            progress({phase: "scanning", message: "Se compară perechile: " + s + "/" + totalPairs + "...", progress: 0.2 + (s / totalPairs) * 0.6});
         }
     }
 
     // Step i: Cluster
-    progress('clustering', 'Clustering ' + scoredPairs.length + ' duplicate pairs...');
+    progress({phase: "clustering", message: "Se grupează rezultatele...", progress: 0.8});
     var clusters = ZotDupe.clusterPairs(scoredPairs);
 
     // Step j: Select canonical for each cluster, classify
+    progress({phase: "scoring", message: "Se calculează scorurile...", progress: 0.9});
     for (var ci = 0; ci < clusters.length; ci++) {
         var cluster = clusters[ci];
         var clusterItems = [];
@@ -455,7 +473,7 @@ ZotDupe.scan = async function (options) {
         scanTimeMs: Date.now() - startTime
     };
 
-    progress('done', 'Scan complete.');
+    progress({phase: "done", message: "Scanare completă!", progress: 1.0});
 
     return { clusters: clusters, stats: stats };
 };
