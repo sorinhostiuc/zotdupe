@@ -1,0 +1,285 @@
+/*
+ * ZotDupe — Merge Preview Stylesheet
+ *
+ * Side-by-side field comparison for duplicate clusters.
+ *
+ * Colors from spec:
+ *   Background: #FFFFFF content
+ *   Text: #1A1A1A primary, gray secondary
+ *   Accent: #5C6BC0
+ *   Identical: white
+ *   Different: #FFF8E1 (light yellow)
+ *   Missing on master: #E3F2FD (light blue)
+ *   Warning: #FFF3E0 bg, #FF8F00 text
+ */
+
+/* ── Root ── */
+#zotdupe-merge-preview-root {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    color: #1A1A1A;
+    background: #FFFFFF;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* ── Header ── */
+#merge-preview-header {
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #E0E0E0;
+}
+
+#merge-preview-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: #1A1A1A;
+}
+
+/* ── Table wrapper (scrollable) ── */
+#merge-preview-table-wrap {
+    flex: 1;
+    overflow: auto;
+    border: 1px solid #E0E0E0;
+    border-radius: 6px;
+    margin-bottom: 10px;
+}
+
+/* ── Table ── */
+#merge-preview-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+#merge-preview-table th,
+#merge-preview-table td {
+    padding: 6px 10px;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid #EEEEEE;
+}
+
+/* ── Header cells ── */
+#merge-preview-table th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* Field name column header */
+#merge-preview-table th.col-field {
+    width: 120px;
+    min-width: 120px;
+    background: #F5F5F5;
+    color: #777;
+}
+
+/* Master column header */
+#merge-preview-table th.col-master {
+    background: #E8F5E9;
+    color: #2E7D32;
+}
+
+/* Duplicate column header */
+#merge-preview-table th.col-dup {
+    background: #F5F5F5;
+    color: #666;
+}
+
+/* ── Field name cells ── */
+#merge-preview-table td.cell-field {
+    width: 120px;
+    min-width: 120px;
+    font-size: 11px;
+    font-weight: bold;
+    color: #888;
+    background: #FAFAFA;
+    word-break: break-word;
+}
+
+/* ── Value cells ── */
+#merge-preview-table td.cell-value {
+    max-width: 200px;
+    word-break: break-word;
+    white-space: pre-wrap;
+}
+
+/* ── Alternating row backgrounds ── */
+#merge-preview-table tbody tr:nth-child(even) td.cell-field {
+    background: #F5F5F5;
+}
+
+/* ── Color coding ── */
+
+/* Identical values across all items */
+tr.row-identical td.cell-value {
+    background: #FFFFFF;
+}
+
+/* Different values — highlight */
+tr.row-different td.cell-value {
+    background: #FFF8E1;
+}
+
+/* Missing on master, present on duplicate */
+td.cell-missing-on-master {
+    background: #E3F2FD !important;
+}
+
+.missing-plus {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    line-height: 16px;
+    text-align: center;
+    border-radius: 50%;
+    background: #4CAF50;
+    color: #FFF;
+    font-size: 12px;
+    font-weight: bold;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+/* ── Clickable / selectable cells ── */
+td.cell-selectable {
+    cursor: pointer;
+    transition: background 0.12s, outline 0.12s;
+    border-radius: 3px;
+}
+
+td.cell-selectable:hover {
+    outline: 2px solid #5C6BC0;
+    outline-offset: -2px;
+}
+
+td.cell-selected {
+    outline: 2px solid #5C6BC0;
+    outline-offset: -2px;
+    background: #E8EAF6 !important;
+}
+
+.selected-check {
+    display: inline-block;
+    margin-right: 4px;
+    color: #5C6BC0;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+/* ── Special row labels ── */
+.type-change-note {
+    font-size: 10px;
+    color: #FF8F00;
+    font-style: italic;
+}
+
+.tag-item {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 8px;
+    background: #EEEEF5;
+    font-size: 10px;
+    color: #555;
+    margin: 1px 2px;
+}
+
+.attachment-item {
+    font-size: 11px;
+    color: #333;
+    display: block;
+    padding: 1px 0;
+}
+
+.collection-item {
+    font-size: 11px;
+    color: #333;
+    display: block;
+    padding: 1px 0;
+}
+
+.union-note {
+    font-size: 10px;
+    color: #888;
+    font-style: italic;
+    display: block;
+    margin-top: 2px;
+}
+
+.empty-value {
+    color: #CCC;
+    font-style: italic;
+}
+
+/* ── Warnings area ── */
+#merge-preview-warnings {
+    margin-bottom: 10px;
+}
+
+#merge-preview-warnings:empty {
+    display: none;
+}
+
+.merge-warning {
+    background: #FFF3E0;
+    color: #FF8F00;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1.5;
+    margin-bottom: 6px;
+}
+
+/* ── Footer / Buttons ── */
+#merge-preview-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding-top: 10px;
+    border-top: 1px solid #E0E0E0;
+}
+
+/* Cancel button — secondary */
+#merge-btn-cancel {
+    background: transparent;
+    border: 1px solid #CCC;
+    border-radius: 6px;
+    padding: 8px 24px;
+    font-size: 13px;
+    color: #555;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+#merge-btn-cancel:hover {
+    background: #F0F0F0;
+}
+
+/* Execute merge button — primary */
+#merge-btn-execute {
+    background: #5C6BC0;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 24px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+#merge-btn-execute:hover {
+    background: #4a59b0;
+    box-shadow: 0 2px 8px rgba(92, 107, 192, 0.35);
+}
+
+#merge-btn-execute:active {
+    background: #3f4e9e;
+}

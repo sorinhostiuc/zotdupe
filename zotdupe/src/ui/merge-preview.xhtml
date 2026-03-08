@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="merge-preview.css" type="text/css"?>
+<window xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        xmlns:html="http://www.w3.org/1999/xhtml"
+        title="ZotDupe — Merge Preview"
+        width="700" height="550"
+        onload="ZotDupeMergePreview.init();">
+
+  <html:div id="zotdupe-merge-preview-root">
+
+    <!-- Header -->
+    <html:div id="merge-preview-header">
+      <html:span id="merge-preview-title">Merge Preview — Cluster #?</html:span>
+    </html:div>
+
+    <!-- Field comparison table (scrollable) -->
+    <html:div id="merge-preview-table-wrap">
+      <html:table id="merge-preview-table">
+        <html:thead id="merge-preview-thead">
+          <!-- Built by JS -->
+        </html:thead>
+        <html:tbody id="merge-preview-tbody">
+          <!-- Built by JS -->
+        </html:tbody>
+      </html:table>
+    </html:div>
+
+    <!-- Warnings area -->
+    <html:div id="merge-preview-warnings">
+      <!-- Built by JS if cross-type -->
+    </html:div>
+
+    <!-- Buttons -->
+    <html:div id="merge-preview-footer">
+      <html:button id="merge-btn-cancel" onclick="ZotDupeMergePreview.onCancel();">Anuleaza</html:button>
+      <html:button id="merge-btn-execute" onclick="ZotDupeMergePreview.onMerge();">Executa merge</html:button>
+    </html:div>
+
+  </html:div>
+
+  <script src="merge-preview.js"/>
+</window>
