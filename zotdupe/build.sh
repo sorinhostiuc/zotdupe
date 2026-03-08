@@ -10,12 +10,12 @@ rm -f ../zotdupe.xpi
 zip -r ../zotdupe.xpi \
   manifest.json \
   bootstrap.js \
-  prefs.js \
   prefs.xhtml \
   src/ \
   icons/ \
   locale/ \
   -x "*.DS_Store" \
-  -x "__MACOSX/*"
+  -x "__MACOSX/*" \
+  -x "src/ui/*.css.bak"
 
 echo "Built zotdupe.xpi ($(du -h ../zotdupe.xpi | cut -f1))"

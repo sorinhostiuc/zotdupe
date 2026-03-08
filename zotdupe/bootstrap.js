@@ -1,46 +1,34 @@
-/* eslint-env mozilla/bootstrap-script */
-/* global Components, Services, Zotero, ChromeUtils */
-
 /**
  * ZotDupe — Semantic Duplicate Detector for Zotero 7+
- *
- * Bootstrap lifecycle hooks for a Zotero 7 plugin (.xpi).
- * This file manages plugin startup/shutdown, chrome registration,
- * menu integration, and preference pane registration.
+ * Bootstrap entry point.
  */
 
 var chromeHandle;
-
-// Reference to loaded modules (populated during startup)
 var ZotDupe;
 
-const PREF_BRANCH = "extensions.zotdupe.";
+function install(data, reason) {}
 
-/**
- * Called when the plugin is first installed.
- */
-function install(data, reason) {
-  // Nothing to do on first install — startup handles initialization.
-}
+function uninstall(data, reason) {}
 
-/**
- * Called when the plugin is about to be removed.
- */
-function uninstall(data, reason) {
-  // Nothing to do on uninstall — shutdown handles cleanup.
-}
-
-/**
- * Called when the plugin is enabled or Zotero starts with the plugin enabled.
- * This is the main initialization entry point.
- */
 async function startup({ id, version, resourceURI, rootURI }, reason) {
-  // Load default preferences
-  Services.scriptloader.loadSubScript(rootURI + "prefs.js");
+  // Fallback for older Zotero builds
+  if (!rootURI) {
+    rootURI = resourceURI.spec;
+  }
 
-  // Register the chrome resource mapping: chrome://zotdupe/content/...
-  // Maps chrome://zotdupe/content/ -> rootURI + "src/"
-  // So chrome://zotdupe/content/ui/config-dialog.xhtml -> src/ui/config-dialog.xhtml
+  await Zotero.initializationPromise;
+
+  // Set default preferences
+  var branch = Services.prefs.getDefaultBranch("extensions.zotdupe.");
+  branch.setCharPref("threshold", "balanced");
+  branch.setBoolPref("enableLegalFingerprint", true);
+  branch.setBoolPref("enablePreprintDetection", true);
+  branch.setBoolPref("enableTranslationDetection", false);
+  branch.setBoolPref("enableCrossType", true);
+  branch.setBoolPref("enableMinHash", false);
+  branch.setCharPref("excludedPairs", "[]");
+
+  // Register chrome mapping: chrome://zotdupe/content/ -> src/
   var aomStartup = Components.classes[
     "@mozilla.org/addons/addon-manager-startup;1"
   ].getService(Components.interfaces.amIAddonManagerStartup);
@@ -49,22 +37,19 @@ async function startup({ id, version, resourceURI, rootURI }, reason) {
     ["content", "zotdupe", rootURI + "src/"],
   ]);
 
-  // Wait for Zotero to be fully initialized
-  await Zotero.initializationPromise;
-
-  // Initialize the ZotDupe global namespace
+  // Initialize global namespace
   ZotDupe = {};
 
-  // Load core modules in dependency order
-  Services.scriptloader.loadSubScript(rootURI + "src/utils/normalize.js");   // ZotDupe.Normalize
-  Services.scriptloader.loadSubScript(rootURI + "src/legal-fingerprint.js"); // ZotDupe.LegalFingerprint
-  Services.scriptloader.loadSubScript(rootURI + "src/blocker.js");           // ZotDupe.Blocker
-  Services.scriptloader.loadSubScript(rootURI + "src/scanner.js");           // ZotDupe.Scanner
-  Services.scriptloader.loadSubScript(rootURI + "src/scorer.js");            // ZotDupe.Scorer
-  Services.scriptloader.loadSubScript(rootURI + "src/canonical.js");         // ZotDupe.Canonical
-  Services.scriptloader.loadSubScript(rootURI + "src/merger.js");            // ZotDupe.Merger
-  Services.scriptloader.loadSubScript(rootURI + "src/utils/minhash.js");     // ZotDupe.MinHash
-  Services.scriptloader.loadSubScript(rootURI + "src/zotdupe.js");           // ZotDupe.scan, etc.
+  // Load modules in dependency order
+  Services.scriptloader.loadSubScript(rootURI + "src/utils/normalize.js");
+  Services.scriptloader.loadSubScript(rootURI + "src/legal-fingerprint.js");
+  Services.scriptloader.loadSubScript(rootURI + "src/blocker.js");
+  Services.scriptloader.loadSubScript(rootURI + "src/scanner.js");
+  Services.scriptloader.loadSubScript(rootURI + "src/scorer.js");
+  Services.scriptloader.loadSubScript(rootURI + "src/canonical.js");
+  Services.scriptloader.loadSubScript(rootURI + "src/merger.js");
+  Services.scriptloader.loadSubScript(rootURI + "src/utils/minhash.js");
+  Services.scriptloader.loadSubScript(rootURI + "src/zotdupe.js");
 
   // Register preference pane
   Zotero.PreferencePanes.register({
@@ -74,73 +59,55 @@ async function startup({ id, version, resourceURI, rootURI }, reason) {
     image: rootURI + "icons/zotdupe.svg",
   });
 
-  // Attach to any already-open main windows
+  // Attach to already-open windows
   var windows = Zotero.getMainWindows();
   for (var win of windows) {
     onMainWindowLoad({ window: win });
   }
 }
 
-/**
- * Called when the plugin is disabled or Zotero shuts down.
- * Must clean up everything — Zotero 7 requires complete teardown.
- */
-function shutdown({ id, version, resourceURI, rootURI }, reason) {
-  // Skip cleanup if Zotero is shutting down entirely
-  if (reason === APP_SHUTDOWN) {
-    return;
-  }
+function onMainWindowLoad({ window }, reason) {
+  var doc = window.document;
 
-  // Remove menu items from all open windows
-  var windows = Zotero.getMainWindows();
-  for (var win of windows) {
-    onMainWindowUnload({ window: win });
-  }
-
-  // Clean up the ZotDupe global
-  ZotDupe = null;
-
-  // Unregister chrome resource
-  if (chromeHandle) {
-    chromeHandle.destruct();
-    chromeHandle = null;
-  }
-}
-
-/**
- * Called for each main Zotero window that opens while the plugin is active.
- * Adds the Tools menu item.
- */
-function onMainWindowLoad({ window: win }) {
-  var doc = win.document;
-
-  // Create the Tools menu item: "ZotDupe: Scan for Duplicates..."
   var menuItem = doc.createXULElement("menuitem");
   menuItem.id = "zotdupe-scan-menuitem";
-  menuItem.setAttribute("data-l10n-id", "zotdupe-menu-label");
+  menuItem.setAttribute("label", "ZotDupe: Scan for Duplicates…");
   menuItem.addEventListener("command", function () {
-    win.openDialog(
+    window.openDialog(
       "chrome://zotdupe/content/ui/config-dialog.xhtml",
       "zotdupe-config",
       "chrome,centerscreen,resizable"
     );
   });
 
-  // Append to the Tools menu (menu_ToolsPopup)
   var toolsMenu = doc.getElementById("menu_ToolsPopup");
   if (toolsMenu) {
     toolsMenu.appendChild(menuItem);
   }
 }
 
-/**
- * Called for each main Zotero window that closes while the plugin is active.
- * Removes the Tools menu item.
- */
-function onMainWindowUnload({ window: win }) {
-  var doc = win.document;
+function onMainWindowUnload({ window }, reason) {
+  var doc = window.document;
   var menuItem = doc.getElementById("zotdupe-scan-menuitem");
   if (menuItem) {
     menuItem.remove();
+  }
+}
+
+function shutdown({ id, version, resourceURI, rootURI }, reason) {
+  if (reason === APP_SHUTDOWN) {
+    return;
+  }
+
+  var windows = Zotero.getMainWindows();
+  for (var win of windows) {
+    onMainWindowUnload({ window: win });
+  }
+
+  ZotDupe = null;
+
+  if (chromeHandle) {
+    chromeHandle.destruct();
+    chromeHandle = null;
   }
 }
