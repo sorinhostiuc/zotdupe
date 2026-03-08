@@ -1,0 +1,141 @@
+/*
+ * ZotDupe — Report Dialog Stylesheet
+ *
+ * Colors from spec:
+ *   Background: #FFFFFF content
+ *   Text: #1A1A1A primary, gray secondary
+ *   Accent: #5C6BC0 primary, #388E3C green
+ */
+
+/* ── Root ── */
+#zotdupe-report-root {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  color: #1A1A1A;
+  background: #F7F7F8;
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+/* ── Header ── */
+#zotdupe-report-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+#zotdupe-report-checkmark {
+  flex-shrink: 0;
+  line-height: 0;
+}
+
+#zotdupe-report-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #388E3C;
+}
+
+/* ── Summary card ── */
+#zotdupe-report-card {
+  background: #FFFFFF;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08), 0 2px 12px rgba(0, 0, 0, 0.04);
+  padding: 20px 24px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Key-value rows */
+.zotdupe-report-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+}
+
+.zotdupe-report-label {
+  font-size: 13px;
+  color: #666;
+}
+
+.zotdupe-report-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+/* Colored values */
+.zotdupe-val-green {
+  color: #388E3C;
+}
+
+.zotdupe-val-gray {
+  color: #888;
+}
+
+.zotdupe-val-amber {
+  color: #F57C00;
+}
+
+.zotdupe-val-blue {
+  color: #1976D2;
+}
+
+/* Separators */
+.zotdupe-report-sep {
+  border: none;
+  border-top: 1px solid #E0E0E0;
+  margin: 8px 0;
+}
+
+/* ── Footer ── */
+#zotdupe-report-footer {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* Export button — secondary */
+#zotdupe-btn-export {
+  background: transparent;
+  border: 1px solid #CCC;
+  border-radius: 6px;
+  padding: 8px 20px;
+  font-size: 13px;
+  color: #555;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+#zotdupe-btn-export:hover {
+  background: #F0F0F0;
+}
+
+/* Close button — primary */
+#zotdupe-btn-close {
+  background: #5C6BC0;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 24px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+#zotdupe-btn-close:hover {
+  background: #4a59b0;
+  box-shadow: 0 2px 8px rgba(92, 107, 192, 0.35);
+}
+
+#zotdupe-btn-close:active {
+  background: #3f4e9e;
+}
