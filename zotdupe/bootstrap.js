@@ -77,7 +77,7 @@ async function startup({ id, version, resourceURI, rootURI }, reason) {
   // Attach to any already-open main windows
   var windows = Zotero.getMainWindows();
   for (var win of windows) {
-    onMainWindowLoad(win);
+    onMainWindowLoad({ window: win });
   }
 }
 
@@ -94,7 +94,7 @@ function shutdown({ id, version, resourceURI, rootURI }, reason) {
   // Remove menu items from all open windows
   var windows = Zotero.getMainWindows();
   for (var win of windows) {
-    onMainWindowUnload(win);
+    onMainWindowUnload({ window: win });
   }
 
   // Clean up the ZotDupe global
@@ -111,7 +111,7 @@ function shutdown({ id, version, resourceURI, rootURI }, reason) {
  * Called for each main Zotero window that opens while the plugin is active.
  * Adds the Tools menu item.
  */
-function onMainWindowLoad(win) {
+function onMainWindowLoad({ window: win }) {
   var doc = win.document;
 
   // Create the Tools menu item: "ZotDupe: Scan for Duplicates..."
@@ -137,7 +137,7 @@ function onMainWindowLoad(win) {
  * Called for each main Zotero window that closes while the plugin is active.
  * Removes the Tools menu item.
  */
-function onMainWindowUnload(win) {
+function onMainWindowUnload({ window: win }) {
   var doc = win.document;
   var menuItem = doc.getElementById("zotdupe-scan-menuitem");
   if (menuItem) {
