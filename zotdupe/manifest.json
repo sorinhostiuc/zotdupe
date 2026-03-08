@@ -2,17 +2,13 @@
   "manifest_version": 2,
   "name": "ZotDupe",
   "version": "1.0.0",
-  "description": "Semantic duplicate detector for Zotero — finds near-duplicates using fuzzy matching, legal fingerprints, preprint detection, and more.",
-  "author": "ZotDupe Contributors",
-  "icons": {
-    "48": "icons/zotdupe.svg",
-    "96": "icons/zotdupe.svg"
-  },
+  "description": "Semantic duplicate detector for Zotero",
+  "author": "Sorin Hostiuc",
   "applications": {
     "zotero": {
       "id": "zotdupe@zotero-plugins.org",
       "strict_min_version": "6.999",
-      "strict_max_version": "8.*"
+      "strict_max_version": "7.0.*"
     }
   }
 }
