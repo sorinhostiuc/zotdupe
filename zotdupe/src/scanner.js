@@ -13,8 +13,8 @@
 if (typeof ZotDupe === 'undefined') var ZotDupe = {};
 if (!ZotDupe.Scanner) ZotDupe.Scanner = {};
 
-var N = ZotDupe.Normalize;
-var LF = ZotDupe.LegalFingerprint;
+var _N = ZotDupe.Normalize;
+var _LF = ZotDupe.LegalFingerprint;
 
 // ============================================================
 // Helper: extract year as integer from item.date
@@ -32,8 +32,8 @@ ZotDupe.Scanner.scoreLayer1 = function (a, b) {
     var hasSomething = false;
 
     // DOI
-    var doiA = N.normalizeDOI(a.DOI);
-    var doiB = N.normalizeDOI(b.DOI);
+    var doiA = __N.normalizeDOI(a.DOI);
+    var doiB = __N.normalizeDOI(b.DOI);
     if (doiA && doiB) {
         hasSomething = true;
         if (doiA === doiB) return 1.0;
@@ -56,8 +56,8 @@ ZotDupe.Scanner.scoreLayer1 = function (a, b) {
     }
 
     // ISBN
-    var isbnA = N.normalizeISBN(a.ISBN);
-    var isbnB = N.normalizeISBN(b.ISBN);
+    var isbnA = __N.normalizeISBN(a.ISBN);
+    var isbnB = __N.normalizeISBN(b.ISBN);
     if (isbnA && isbnB) {
         hasSomething = true;
         if (isbnA === isbnB) return 1.0;
@@ -71,8 +71,8 @@ ZotDupe.Scanner.scoreLayer1 = function (a, b) {
 // Layer 2 — Normalized Title + Year
 // ============================================================
 ZotDupe.Scanner.scoreLayer2 = function (a, b) {
-    var titleA = N.normalizeTitle(a.title);
-    var titleB = N.normalizeTitle(b.title);
+    var titleA = _N.normalizeTitle(a.title);
+    var titleB = _N.normalizeTitle(b.title);
     if (!titleA || !titleB) return 0.0;
 
     var yearA = _extractYear(a);
@@ -86,7 +86,7 @@ ZotDupe.Scanner.scoreLayer2 = function (a, b) {
         return 0.70;
     }
 
-    var jaccard = N.jaccardSimilarity(titleA, titleB);
+    var jaccard = _N.jaccardSimilarity(titleA, titleB);
 
     if (jaccard >= 0.90) {
         if (sameYear) return 0.85;
@@ -110,11 +110,11 @@ ZotDupe.Scanner.scoreLayer3 = function (a, b) {
     var setB = {};
     var i;
     for (i = 0; i < creatorsA.length; i++) {
-        var na = N.normalizeAuthor(creatorsA[i]);
+        var na = _N.normalizeAuthor(creatorsA[i]);
         if (na) setA[na] = true;
     }
     for (i = 0; i < creatorsB.length; i++) {
-        var nb = N.normalizeAuthor(creatorsB[i]);
+        var nb = _N.normalizeAuthor(creatorsB[i]);
         if (nb) setB[nb] = true;
     }
 
@@ -135,8 +135,8 @@ ZotDupe.Scanner.scoreLayer3 = function (a, b) {
 // Layer 4 — Legal Fingerprint
 // ============================================================
 ZotDupe.Scanner.scoreLayer4 = function (a, b) {
-    var fpA = LF.extractLegalFingerprint(a.title);
-    var fpB = LF.extractLegalFingerprint(b.title);
+    var fpA = _LF.extractLegalFingerprint(a.title);
+    var fpB = _LF.extractLegalFingerprint(b.title);
     if (!fpA || !fpB) return null;
 
     if (fpA.type === fpB.type && fpA.number === fpB.number && fpA.year === fpB.year) {
@@ -152,8 +152,8 @@ ZotDupe.Scanner.scoreLayer4 = function (a, b) {
 ZotDupe.Scanner.scoreLayer5 = function (a, b) {
     if (!a.url || !b.url) return null;
 
-    var urlA = N.normalizeURL(a.url);
-    var urlB = N.normalizeURL(b.url);
+    var urlA = _N.normalizeURL(a.url);
+    var urlB = _N.normalizeURL(b.url);
     if (!urlA || !urlB) return null;
 
     if (urlA === urlB) return 0.95;
@@ -191,15 +191,15 @@ ZotDupe.Scanner.scoreLayer6 = function (a, b) {
                  (_isPreprintLike(b) && _isJournalLike(a));
     if (!pairOk) return null;
 
-    var titleA = N.normalizeTitle(a.title);
-    var titleB = N.normalizeTitle(b.title);
-    var jaccard = N.jaccardSimilarity(titleA, titleB);
+    var titleA = _N.normalizeTitle(a.title);
+    var titleB = _N.normalizeTitle(b.title);
+    var jaccard = _N.jaccardSimilarity(titleA, titleB);
 
     if (jaccard < 0.80) return 0.0;
 
     // Compare first author
-    var firstA = (a.creators && a.creators.length > 0) ? N.normalizeAuthor(a.creators[0]) : '';
-    var firstB = (b.creators && b.creators.length > 0) ? N.normalizeAuthor(b.creators[0]) : '';
+    var firstA = (a.creators && a.creators.length > 0) ? _N.normalizeAuthor(a.creators[0]) : '';
+    var firstB = (b.creators && b.creators.length > 0) ? _N.normalizeAuthor(b.creators[0]) : '';
 
     if (firstA && firstB && firstA === firstB) return 0.90;
     return 0.70;
@@ -291,13 +291,13 @@ ZotDupe.Scanner.scanPair = function (itemA, itemB, options) {
     if (scores.layer1 !== null && scores.layer1 > bestScore) {
         bestScore = scores.layer1;
         // Determine specific identifier type
-        var doiA = N.normalizeDOI(itemA.DOI);
-        var doiB = N.normalizeDOI(itemB.DOI);
+        var doiA = _N.normalizeDOI(itemA.DOI);
+        var doiB = _N.normalizeDOI(itemB.DOI);
         if (doiA && doiB && doiA === doiB) {
             matchType = 'DOI identic';
         } else {
-            var isbnA = N.normalizeISBN(itemA.ISBN);
-            var isbnB = N.normalizeISBN(itemB.ISBN);
+            var isbnA = _N.normalizeISBN(itemA.ISBN);
+            var isbnB = _N.normalizeISBN(itemB.ISBN);
             var pmidA = (itemA.PMID || '').trim();
             var pmidB = (itemB.PMID || '').trim();
             if (pmidA && pmidB && pmidA === pmidB) {

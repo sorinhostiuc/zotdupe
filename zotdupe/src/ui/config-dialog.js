@@ -11,7 +11,7 @@
 var ZotDupeConfigDialog = {
   /** Threshold presets mapping slider position to numeric value and label */
   _thresholds: [
-    { value: 0.85, name: "Strict",   desc: "Va detecta doar duplicatele foarte sigure." },
+    { value: 0.90, name: "Strict",   desc: "Va detecta doar duplicatele foarte sigure." },
     { value: 0.75, name: "Balansat", desc: "Va detecta duplicate probabile și sigure." },
     { value: 0.60, name: "Relaxat", desc: "Va detecta și potriviri parțiale — mai multe rezultate, posibil zgomot." },
   ],
@@ -242,6 +242,16 @@ var ZotDupeConfigDialog = {
     try {
       var result = await ZotDupe.scan(scanOptions);
 
+      // Build zoteroItems map from scanned items
+      var zoteroItemsMap = {};
+      var allItems = await Zotero.Items.getAll(Zotero.Libraries.userLibraryID);
+      allItems = allItems.filter(function (item) {
+        return item.isRegularItem && item.isRegularItem();
+      });
+      for (var item of allItems) {
+        zoteroItemsMap[item.id] = item;
+      }
+
       // Build config object to pass to the results panel
       var config = {
         scope: scope,
@@ -250,6 +260,7 @@ var ZotDupeConfigDialog = {
         thresholdName: thresholdName,
         options: options,
         scanResult: result,
+        zoteroItems: zoteroItemsMap,
       };
 
       // Close this dialog
@@ -259,7 +270,7 @@ var ZotDupeConfigDialog = {
       var mainWindow = Zotero.getMainWindow();
       if (mainWindow) {
         mainWindow.openDialog(
-          "chrome://zotdupe/content/src/ui/results-panel.xhtml",
+          "chrome://zotdupe/content/ui/results-panel.xhtml",
           "zotdupe-results",
           "chrome,centerscreen,resizable=yes,width=900,height=600",
           config

@@ -47,6 +47,7 @@ var ZotDupeResults = {
         bill:            '\u2696\uFE0F',
         hearing:         '\u2696\uFE0F',
         letter:          '\u2709\uFE0F',   // envelope
+        preprint:        '\uD83D\uDCC4',   // page facing up
         manuscript:      '\uD83D\uDCDC',   // scroll
         presentation:    '\uD83D\uDCCA',   // bar chart
         default:         '\uD83D\uDCC4'    // page facing up

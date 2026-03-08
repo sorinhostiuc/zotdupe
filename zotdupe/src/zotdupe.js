@@ -427,6 +427,11 @@ ZotDupe.scan = async function (options) {
             matchType: scanResult.matchType
         });
 
+        // Yield to UI every 100 iterations
+        if (s % 100 === 0 && s > 0) {
+            await new Promise(function (r) { setTimeout(r, 0); });
+        }
+
         // Progress every 500 pairs
         if (s % 500 === 0 && s > 0) {
             progress({phase: "scanning", message: "Se compară perechile: " + s + "/" + totalPairs + "...", progress: 0.2 + (s / totalPairs) * 0.6});
@@ -446,7 +451,8 @@ ZotDupe.scan = async function (options) {
             var cid = cluster.ids[cj];
             if (plainById[cid]) clusterItems.push(plainById[cid]);
         }
-        cluster.canonicalId = ZotDupe.Canonical.selectCanonical(clusterItems);
+        cluster.canonicalId = ZotDupe.Canonical.selectCanonical(clusterItems).id;
+        cluster.items = cluster.ids.map(function (id) { return plainById[id]; }).filter(Boolean);
         cluster.classification = ZotDupe.Scorer.classify(cluster.score, threshold);
     }
 
@@ -516,12 +522,14 @@ ZotDupe.mergeCluster = async function (cluster, canonicalId, zoteroItems) {
         if (dupType !== masterType) {
             // Preserve lost fields in Extra before type change
             var dupPlain = ZotDupe.itemToPlain(dupItem);
-            if (ZotDupe.Merger && ZotDupe.Merger.prepareCrossTypeMerge) {
-                var mergeInfo = ZotDupe.Merger.prepareCrossTypeMerge(dupPlain, masterType);
-                if (mergeInfo && mergeInfo.extraAppend) {
-                    var currentExtra = dupItem.getField('extra') || '';
-                    dupItem.setField('extra', currentExtra + '\n' + mergeInfo.extraAppend);
+            var lostFields = ZotDupe.Merger.findLostFields(dupPlain, masterItem.itemType || Zotero.ItemTypes.getName(masterItem.itemTypeID));
+            if (Object.keys(lostFields).length > 0) {
+                var extraLines = ['[ZotDupe:preserved] originalType: ' + dupPlain.itemType];
+                for (var field in lostFields) {
+                    extraLines.push('[ZotDupe:preserved] ' + field + ': ' + lostFields[field]);
                 }
+                var currentExtra = dupItem.getField('extra') || '';
+                dupItem.setField('extra', (currentExtra ? currentExtra + '\n' : '') + extraLines.join('\n'));
             }
             dupItem.itemTypeID = Zotero.ItemTypes.getID(masterType);
             await dupItem.saveTx();

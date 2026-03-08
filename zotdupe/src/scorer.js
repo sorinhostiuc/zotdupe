@@ -47,15 +47,16 @@ ZotDupe.Scorer.getThresholdValue = function (threshold) {
  * @param {number|null} layer2 - title similarity
  * @param {number|null} layer3 - author similarity
  * @param {number|null} layer5 - URL/attachment similarity
- * @returns {number} combined score, or 0 if all three are null
+ * @param {number|null} layer6 - preprint detection
+ * @returns {number} combined score, or 0 if all are null
  */
-ZotDupe.Scorer._combinedScore = function (layer2, layer3, layer5) {
-    var weights = { layer2: 0.50, layer3: 0.25, layer5: 0.15 };
-    var layers  = { layer2: layer2, layer3: layer3, layer5: layer5 };
+ZotDupe.Scorer._combinedScore = function (layer2, layer3, layer5, layer6) {
+    var weights = { layer2: 0.50, layer3: 0.25, layer5: 0.15, layer6: 0.10 };
+    var layers  = { layer2: layer2, layer3: layer3, layer5: layer5, layer6: layer6 };
 
     var sum = 0;
     var wSum = 0;
-    var keys = ['layer2', 'layer3', 'layer5'];
+    var keys = ['layer2', 'layer3', 'layer5', 'layer6'];
     for (var i = 0; i < keys.length; i++) {
         var k = keys[i];
         if (layers[k] !== null && layers[k] !== undefined) {
@@ -91,14 +92,11 @@ ZotDupe.Scorer.computeScore = function (layerScores) {
     // Strategy 4: Legal fingerprint (ceiling 0.90)
     if (l4 !== null) candidates.push(l4 * 0.90);
 
-    // Combined score from title + author + URL (layers 2+3+5)
-    var combined = ZotDupe.Scorer._combinedScore(l2, l3, l5);
-    if (l2 !== null || l3 !== null || l5 !== null) {
+    // Combined score from title + author + URL + preprint (layers 2+3+5+6)
+    var combined = ZotDupe.Scorer._combinedScore(l2, l3, l5, l6);
+    if (l2 !== null || l3 !== null || l5 !== null || l6 !== null) {
         candidates.push(combined);
     }
-
-    // Strategy 6: Preprint detection (ceiling 0.85)
-    if (l6 !== null) candidates.push(l6 * 0.85);
 
     // Strategy 7: Translation detection (ceiling 0.60)
     if (l7 !== null) candidates.push(l7 * 0.60);

@@ -7,9 +7,9 @@
 
     <html:div style="padding: 8px;">
       <label value="Threshold preset:" />
-      <menulist id="zotdupe-pref-threshold" preference="extensions.zotdupe.thresholdPreset">
+      <menulist id="zotdupe-pref-threshold" preference="extensions.zotdupe.threshold">
         <menupopup>
-          <menuitem label="Strict (≥ 0.85)" value="strict" />
+          <menuitem label="Strict (≥ 0.90)" value="strict" />
           <menuitem label="Balanced (≥ 0.75)" value="balanced" />
           <menuitem label="Relaxed (≥ 0.60)" value="relaxed" />
         </menupopup>
@@ -19,25 +19,25 @@
     <html:div style="padding: 8px;">
       <checkbox id="zotdupe-pref-legal"
                 label="Enable legal fingerprint matching (ISBN, DOI, PMID)"
-                preference="extensions.zotdupe.legalFingerprint" />
+                preference="extensions.zotdupe.enableLegalFingerprint" />
     </html:div>
 
     <html:div style="padding: 8px;">
       <checkbox id="zotdupe-pref-preprint"
                 label="Detect preprint → published article pairs"
-                preference="extensions.zotdupe.detectPreprint" />
+                preference="extensions.zotdupe.enablePreprintDetection" />
     </html:div>
 
     <html:div style="padding: 8px;">
       <checkbox id="zotdupe-pref-crosstype"
                 label="Match across item types (conference vs. journal, etc.)"
-                preference="extensions.zotdupe.crossType" />
+                preference="extensions.zotdupe.enableCrossType" />
     </html:div>
 
     <html:div style="padding: 8px;">
       <checkbox id="zotdupe-pref-minhash"
                 label="Use MinHash LSH for large libraries (approximate matching)"
-                preference="extensions.zotdupe.minhash" />
+                preference="extensions.zotdupe.enableMinHash" />
     </html:div>
   </groupbox>
 

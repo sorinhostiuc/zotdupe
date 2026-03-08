@@ -63,7 +63,7 @@ ZotDupe.LegalFingerprint.extractLegalFingerprint = function (title) {
 /**
  * Zotero item types that are inherently legal.
  */
-var LEGAL_ITEM_TYPES = ['statute', 'bill', 'hearing', 'regulation', 'case'];
+var LEGAL_ITEM_TYPES = ['statute', 'bill', 'hearing', 'regulation', 'case', 'legal_case'];
 
 /**
  * Check whether a Zotero item is a legal document.
