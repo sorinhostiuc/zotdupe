@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="results-panel.css" type="text/css"?>
+<window xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        xmlns:html="http://www.w3.org/1999/xhtml"
+        title="ZotDupe — Rezultate scanare"
+        width="880" height="650"
+        onload="ZotDupeResults.init();">
+  <html:div id="zotdupe-results-root">
+
+    <!-- ========== Statistics Bar ========== -->
+    <html:div id="zotdupe-stats-bar">
+      <html:div class="zotdupe-stat-card" id="stat-scanned">
+        <html:span class="stat-number" style="color:#333333">0</html:span>
+        <html:span class="stat-label">Items scanate</html:span>
+      </html:div>
+      <html:div class="zotdupe-stat-card" id="stat-clusters">
+        <html:span class="stat-number" style="color:#5C6BC0">0</html:span>
+        <html:span class="stat-label">Clustere</html:span>
+      </html:div>
+      <html:div class="zotdupe-stat-card" id="stat-sure">
+        <html:span class="stat-number" style="color:#388E3C">0</html:span>
+        <html:span class="stat-label">Sigure ≥0.95</html:span>
+      </html:div>
+      <html:div class="zotdupe-stat-card" id="stat-probable">
+        <html:span class="stat-number" style="color:#FF8F00">0</html:span>
+        <html:span class="stat-label">Probabile 0.80–0.94</html:span>
+      </html:div>
+      <html:div class="zotdupe-stat-card" id="stat-possible">
+        <html:span class="stat-number" style="color:#EF5350">0</html:span>
+        <html:span class="stat-label">Posibile 0.60–0.79</html:span>
+      </html:div>
+    </html:div>
+
+    <!-- ========== Filter Bar ========== -->
+    <html:div id="zotdupe-filter-bar">
+      <html:div class="zotdupe-filter-chips">
+        <html:button class="zotdupe-chip active" data-filter="all" onclick="ZotDupeResults.onFilterChange('all')">Toate: <html:span class="chip-count" id="chip-all">0</html:span></html:button>
+        <html:button class="zotdupe-chip chip-sure" data-filter="sure" onclick="ZotDupeResults.onFilterChange('sure')">Sigure: <html:span class="chip-count" id="chip-sure">0</html:span></html:button>
+        <html:button class="zotdupe-chip chip-probable" data-filter="probable" onclick="ZotDupeResults.onFilterChange('probable')">Probabile: <html:span class="chip-count" id="chip-probable">0</html:span></html:button>
+        <html:button class="zotdupe-chip chip-possible" data-filter="possible" onclick="ZotDupeResults.onFilterChange('possible')">Posibile: <html:span class="chip-count" id="chip-possible">0</html:span></html:button>
+      </html:div>
+      <html:input type="text" id="zotdupe-search" placeholder="Caută în clustere..." oninput="ZotDupeResults.onSearch(this.value)"/>
+    </html:div>
+
+    <!-- ========== Cluster List (scrollable) ========== -->
+    <html:div id="zotdupe-cluster-list">
+      <!-- Cluster cards rendered here by JS -->
+    </html:div>
+
+    <!-- ========== Bottom Bar ========== -->
+    <html:div id="zotdupe-bottom-bar">
+      <html:div class="bottom-left">
+        <html:span id="zotdupe-resolved-label">Clustere rezolvate: 0/0</html:span>
+      </html:div>
+      <html:div class="bottom-right">
+        <html:button id="btn-auto-merge" class="btn-auto-merge" onclick="ZotDupeResults.onAutoMergeAllSure()">Merge automat toate sigure (<html:span id="auto-merge-count">0</html:span>)</html:button>
+        <html:button id="btn-close" class="btn-close" onclick="ZotDupeResults.onClose()">Închide</html:button>
+      </html:div>
+    </html:div>
+
+  </html:div>
+  <script src="results-panel.js"/>
+</window>

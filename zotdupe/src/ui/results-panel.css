@@ -1,0 +1,456 @@
+/* ============================================================
+ * ZotDupe Results Panel — Stylesheet
+ * ============================================================ */
+
+/* ---------- Root container ---------- */
+#zotdupe-results-root {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    color: #333;
+    background: #FFFFFF;
+    overflow: hidden;
+}
+
+/* ============================================================
+ * Statistics Bar
+ * ============================================================ */
+#zotdupe-stats-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    height: 56px;
+    min-height: 56px;
+    background: #F0F0F5;
+    border-bottom: 1px solid #DDDDE3;
+    padding: 0 12px;
+    gap: 8px;
+}
+
+.zotdupe-stat-card {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 120px;
+    min-width: 100px;
+    height: 44px;
+    background: #FFFFFF;
+    border-radius: 6px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+    padding: 2px 8px;
+}
+
+.stat-number {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.stat-label {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: #777;
+    line-height: 1.2;
+    text-align: center;
+}
+
+/* ============================================================
+ * Filter Bar
+ * ============================================================ */
+#zotdupe-filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    border-bottom: 1px solid #E8E8EE;
+    background: #FAFAFE;
+}
+
+.zotdupe-filter-chips {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.zotdupe-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 12px;
+    border-radius: 14px;
+    border: 1px solid #CCCCDD;
+    background: #FFFFFF;
+    font-size: 12px;
+    font-weight: 500;
+    color: #555;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    outline: none;
+}
+
+.zotdupe-chip:hover {
+    background: #EDEDF5;
+}
+
+.zotdupe-chip.active {
+    background: #5C6BC0;
+    color: #FFF;
+    border-color: #5C6BC0;
+}
+
+.zotdupe-chip.chip-sure.active {
+    background: #388E3C;
+    border-color: #388E3C;
+}
+
+.zotdupe-chip.chip-probable.active {
+    background: #FF8F00;
+    border-color: #FF8F00;
+}
+
+.zotdupe-chip.chip-possible.active {
+    background: #EF5350;
+    border-color: #EF5350;
+}
+
+.chip-count {
+    font-weight: 700;
+}
+
+#zotdupe-search {
+    flex: 1;
+    min-width: 140px;
+    padding: 5px 10px;
+    border: 1px solid #CCCCDD;
+    border-radius: 14px;
+    font-size: 12px;
+    outline: none;
+    background: #FFF;
+    transition: border-color 0.15s;
+}
+
+#zotdupe-search:focus {
+    border-color: #5C6BC0;
+    box-shadow: 0 0 0 2px rgba(92,107,192,0.15);
+}
+
+/* ============================================================
+ * Cluster List (scrollable main area)
+ * ============================================================ */
+#zotdupe-cluster-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px 14px;
+    background: #FAFAFA;
+}
+
+/* ---------- Cluster Card ---------- */
+.zotdupe-cluster-card {
+    width: 100%;
+    margin: 8px 0;
+    border: 1px solid #E0E0E0;
+    border-radius: 8px;
+    background: #FFFFFF;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: box-shadow 0.15s;
+}
+
+.zotdupe-cluster-card:hover {
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+/* Color-coded left border */
+.zotdupe-cluster-card.sure   { border-left: 4px solid #388E3C; }
+.zotdupe-cluster-card.probable { border-left: 4px solid #FF8F00; }
+.zotdupe-cluster-card.possible { border-left: 4px solid #EF5350; }
+
+/* ---------- Card Header ---------- */
+.cluster-header {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    padding: 0 12px;
+    background: #FAFAFA;
+    border-bottom: 1px solid #EEEEEE;
+    gap: 8px;
+}
+
+.cluster-label {
+    font-weight: 600;
+    font-size: 13px;
+    color: #333;
+}
+
+.score-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    font-size: 10px;
+    font-weight: 700;
+    color: #FFF;
+    flex-shrink: 0;
+}
+
+.score-badge.sure     { background: #388E3C; }
+.score-badge.probable { background: #FF8F00; }
+.score-badge.possible { background: #EF5350; }
+
+.match-type {
+    font-style: italic;
+    font-size: 11px;
+    color: #888;
+}
+
+.item-count-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: #EEEEF5;
+    font-size: 11px;
+    font-weight: 500;
+    color: #555;
+    margin-left: auto;
+}
+
+/* ---------- Item rows ---------- */
+.cluster-items {
+    padding: 6px 0;
+}
+
+.cluster-item-row {
+    display: flex;
+    align-items: center;
+    padding: 5px 12px;
+    gap: 8px;
+    min-height: 30px;
+    transition: background 0.1s;
+}
+
+.cluster-item-row:hover {
+    background: #F5F5FA;
+}
+
+.cluster-item-row input[type="radio"] {
+    flex-shrink: 0;
+    cursor: pointer;
+    accent-color: #5C6BC0;
+}
+
+.item-type-icon {
+    flex-shrink: 0;
+    font-size: 14px;
+    width: 20px;
+    text-align: center;
+}
+
+.item-title {
+    font-weight: 600;
+    font-size: 12px;
+    color: #222;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 340px;
+}
+
+.item-authors {
+    font-size: 11px;
+    color: #888;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 160px;
+}
+
+.item-year {
+    font-family: "SF Mono", "Menlo", "Consolas", monospace;
+    font-size: 11px;
+    color: #555;
+    flex-shrink: 0;
+}
+
+.item-type-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 6px;
+    border-radius: 8px;
+    background: #EAEAEA;
+    font-size: 10px;
+    color: #666;
+    flex-shrink: 0;
+}
+
+.item-doi-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 5px;
+    border-radius: 6px;
+    background: #E3F2FD;
+    color: #1565C0;
+    font-size: 9px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.item-pdf-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 5px;
+    border-radius: 6px;
+    background: #FFEBEE;
+    color: #C62828;
+    font-size: 9px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.canonical-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #388E3C;
+    flex-shrink: 0;
+}
+
+/* ---------- Card Actions ---------- */
+.cluster-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-top: 1px solid #F0F0F0;
+}
+
+.btn-merge,
+.btn-non-dup,
+.btn-detail {
+    height: 28px;
+    padding: 0 12px;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    outline: none;
+    transition: opacity 0.15s, box-shadow 0.15s;
+}
+
+.btn-merge {
+    background: #5C6BC0;
+    color: #FFF;
+    border: none;
+}
+
+.btn-merge:hover {
+    background: #4a59b0;
+}
+
+.btn-non-dup {
+    background: #FFF;
+    color: #555;
+    border: 1px solid #CCC;
+}
+
+.btn-non-dup:hover {
+    background: #F5F5F5;
+    border-color: #AAA;
+}
+
+.btn-detail {
+    background: #FFF;
+    color: #555;
+    border: 1px solid #CCC;
+}
+
+.btn-detail:hover {
+    background: #F5F5F5;
+    border-color: #AAA;
+}
+
+/* ============================================================
+ * Bottom Bar
+ * ============================================================ */
+#zotdupe-bottom-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    min-height: 60px;
+    padding: 0 16px;
+    background: #F0F0F5;
+    border-top: 1px solid #DDDDE3;
+}
+
+.bottom-left {
+    font-size: 13px;
+    font-weight: 500;
+    color: #555;
+}
+
+.bottom-right {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-auto-merge {
+    height: 32px;
+    padding: 0 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+    background: #FFF;
+    color: #388E3C;
+    border: 2px solid #388E3C;
+    transition: background 0.15s, color 0.15s;
+}
+
+.btn-auto-merge:hover {
+    background: #388E3C;
+    color: #FFF;
+}
+
+.btn-auto-merge:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-close {
+    height: 32px;
+    padding: 0 16px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    outline: none;
+    background: #FFF;
+    color: #555;
+    border: 1px solid #CCC;
+    transition: background 0.15s;
+}
+
+.btn-close:hover {
+    background: #EEE;
+}
+
+/* ---------- Empty / no-results state ---------- */
+.zotdupe-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+    font-size: 14px;
+}
+
+/* ---------- Cluster card resolved overlay ---------- */
+.zotdupe-cluster-card.resolved {
+    opacity: 0.45;
+    pointer-events: none;
+}
