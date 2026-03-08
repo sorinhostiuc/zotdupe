@@ -35,28 +35,36 @@ function uninstall(data, reason) {
  * This is the main initialization entry point.
  */
 async function startup({ id, version, resourceURI, rootURI }, reason) {
-  // Register chrome resource so we can load sub-scripts
-  // rootURI is something like "jar:file:///path/to/zotdupe.xpi!/"
-  // or "file:///path/to/zotdupe/" during development
+  // Load default preferences
   Services.scriptloader.loadSubScript(rootURI + "prefs.js");
 
   // Register the chrome resource mapping: chrome://zotdupe/content/...
+  // Maps chrome://zotdupe/content/ -> rootURI + "src/"
+  // So chrome://zotdupe/content/ui/config-dialog.xhtml -> src/ui/config-dialog.xhtml
   var aomStartup = Components.classes[
     "@mozilla.org/addons/addon-manager-startup;1"
   ].getService(Components.interfaces.amIAddonManagerStartup);
   var manifestURI = Services.io.newURI(rootURI + "manifest.json");
   chromeHandle = aomStartup.registerChrome(manifestURI, [
-    ["content", "zotdupe", rootURI],
+    ["content", "zotdupe", rootURI + "src/"],
   ]);
 
   // Wait for Zotero to be fully initialized
   await Zotero.initializationPromise;
 
-  // TODO: Load core modules from src/ via Services.scriptloader.loadSubScript
-  // e.g.:
-  //   Services.scriptloader.loadSubScript(rootURI + "src/duplicateEngine.js");
-  //   Services.scriptloader.loadSubScript(rootURI + "src/ui.js");
-  //   Services.scriptloader.loadSubScript(rootURI + "src/prefs.js");
+  // Initialize the ZotDupe global namespace
+  ZotDupe = {};
+
+  // Load core modules in dependency order
+  Services.scriptloader.loadSubScript(rootURI + "src/utils/normalize.js");   // ZotDupe.Normalize
+  Services.scriptloader.loadSubScript(rootURI + "src/legal-fingerprint.js"); // ZotDupe.LegalFingerprint
+  Services.scriptloader.loadSubScript(rootURI + "src/blocker.js");           // ZotDupe.Blocker
+  Services.scriptloader.loadSubScript(rootURI + "src/scanner.js");           // ZotDupe.Scanner
+  Services.scriptloader.loadSubScript(rootURI + "src/scorer.js");            // ZotDupe.Scorer
+  Services.scriptloader.loadSubScript(rootURI + "src/canonical.js");         // ZotDupe.Canonical
+  Services.scriptloader.loadSubScript(rootURI + "src/merger.js");            // ZotDupe.Merger
+  Services.scriptloader.loadSubScript(rootURI + "src/utils/minhash.js");     // ZotDupe.MinHash
+  Services.scriptloader.loadSubScript(rootURI + "src/zotdupe.js");           // ZotDupe.scan, etc.
 
   // Register preference pane
   Zotero.PreferencePanes.register({
@@ -89,10 +97,8 @@ function shutdown({ id, version, resourceURI, rootURI }, reason) {
     onMainWindowUnload(win);
   }
 
-  // TODO: Destruct / unload any modules loaded from src/
-  // e.g.:
-  //   ZotDupe.destroy();
-  //   ZotDupe = undefined;
+  // Clean up the ZotDupe global
+  ZotDupe = null;
 
   // Unregister chrome resource
   if (chromeHandle) {
@@ -114,9 +120,9 @@ function onMainWindowLoad(win) {
   menuItem.setAttribute("data-l10n-id", "zotdupe-menu-label");
   menuItem.addEventListener("command", function () {
     win.openDialog(
-      "chrome://zotdupe/content/src/ui/config-dialog.xhtml",
+      "chrome://zotdupe/content/ui/config-dialog.xhtml",
       "zotdupe-config",
-      "chrome,centerscreen,resizable=no,width=560,height=420"
+      "chrome,centerscreen,resizable"
     );
   });
 
