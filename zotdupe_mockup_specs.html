@@ -1,0 +1,1901 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZotDupe — Semantic Duplicate Checker for Zotero — Mockup + Specificații</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-app: #1e1e2e;
+  --bg-panel: #252536;
+  --bg-panel-alt: #2a2a3d;
+  --bg-card: #2f2f45;
+  --bg-hover: #353550;
+  --bg-input: #1a1a2a;
+  --border: #3a3a55;
+  --border-light: #454565;
+  --text-primary: #e0e0f0;
+  --text-secondary: #9595b5;
+  --text-muted: #6a6a88;
+  --accent-blue: #5b8af5;
+  --accent-blue-hover: #7aa3ff;
+  --accent-blue-bg: rgba(91, 138, 245, 0.12);
+  --accent-green: #4ade80;
+  --accent-green-bg: rgba(74, 222, 128, 0.1);
+  --accent-yellow: #fbbf24;
+  --accent-yellow-bg: rgba(251, 191, 36, 0.1);
+  --accent-red: #f87171;
+  --accent-red-bg: rgba(248, 113, 113, 0.1);
+  --accent-orange: #fb923c;
+  --accent-orange-bg: rgba(251, 146, 60, 0.1);
+  --accent-purple: #a78bfa;
+  --accent-purple-bg: rgba(167, 139, 250, 0.1);
+  --accent-cyan: #22d3ee;
+  --accent-cyan-bg: rgba(34, 211, 238, 0.1);
+  --zotero-red: #cc2936;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
+  --transition: 0.2s ease;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  background: #13131f;
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px;
+  gap: 32px;
+}
+
+/* ===== SECTION HEADERS ===== */
+.section-header {
+  width: 100%;
+  max-width: 900px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.section-tag {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--accent-purple);
+  background: var(--accent-purple-bg);
+  padding: 5px 14px;
+  border-radius: 20px;
+  align-self: flex-start;
+}
+
+.section-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.section-subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 700px;
+}
+
+/* ===== SCREEN LABEL ===== */
+.screen-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent-blue);
+  background: var(--accent-blue-bg);
+  padding: 6px 14px;
+  border-radius: 20px;
+  margin-bottom: -16px;
+  align-self: flex-start;
+  max-width: 900px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ===== WINDOW CHROME ===== */
+.window {
+  width: 100%;
+  max-width: 900px;
+  background: var(--bg-app);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.window-titlebar {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border);
+  gap: 10px;
+}
+
+.window-dots { display: flex; gap: 6px; }
+.window-dot { width: 12px; height: 12px; border-radius: 50%; }
+.window-dot.red { background: #ff5f57; }
+.window-dot.yellow { background: #ffbd2e; }
+.window-dot.green { background: #28c840; }
+
+.window-title {
+  flex: 1;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  letter-spacing: 0.3px;
+}
+
+.window-title .icon { margin-right: 6px; font-size: 14px; }
+.window-body { padding: 0; }
+
+/* ===== SPEC BLOCKS ===== */
+.spec-block {
+  width: 100%;
+  max-width: 900px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.spec-header {
+  padding: 16px 24px;
+  background: var(--bg-panel-alt);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.spec-header-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.spec-header-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.spec-header-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.spec-body {
+  padding: 24px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+.spec-body h4 {
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  margin: 16px 0 8px 0;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(58,58,85,0.4);
+}
+
+.spec-body h4:first-child { margin-top: 0; }
+
+.spec-body p { margin: 8px 0; }
+
+.spec-body code {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  background: var(--bg-input);
+  padding: 2px 6px;
+  border-radius: 3px;
+  color: var(--accent-cyan);
+}
+
+.spec-body pre {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  overflow-x: auto;
+  margin: 12px 0;
+  white-space: pre;
+}
+
+.spec-body .highlight { color: var(--accent-blue); font-weight: 600; }
+.spec-body .green { color: var(--accent-green); }
+.spec-body .yellow { color: var(--accent-yellow); }
+.spec-body .red { color: var(--accent-red); }
+
+.spec-body ul {
+  margin: 8px 0 8px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.spec-body li { line-height: 1.6; }
+
+.algo-step {
+  display: flex;
+  gap: 12px;
+  padding: 10px 14px;
+  margin: 6px 0;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  border-left: 3px solid var(--accent-blue);
+}
+
+.algo-step-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent-blue);
+  flex-shrink: 0;
+  width: 24px;
+}
+
+.algo-step-text {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.algo-step-text strong { color: var(--text-primary); }
+
+/* ===== SCREEN 1: SCAN CONFIG ===== */
+.scan-config {
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.plugin-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.plugin-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.plugin-logo::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--accent-purple), var(--zotero-red));
+  opacity: 0.9;
+}
+
+.plugin-logo span {
+  position: relative;
+  z-index: 1;
+  color: white;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.plugin-info { display: flex; flex-direction: column; gap: 2px; }
+
+.plugin-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.plugin-version {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+/* Config form */
+.config-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.config-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+}
+
+.config-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.config-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.config-card:hover {
+  border-color: var(--accent-blue);
+  background: var(--bg-hover);
+}
+
+.config-card.selected {
+  border-color: var(--accent-blue);
+  background: var(--accent-blue-bg);
+}
+
+.config-radio {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--border-light);
+  flex-shrink: 0;
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.config-card.selected .config-radio {
+  border-color: var(--accent-blue);
+  background: var(--accent-blue);
+}
+
+.config-card.selected .config-radio::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: white;
+}
+
+.config-card-text { display: flex; flex-direction: column; gap: 2px; }
+
+.config-card-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.config-card-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 0;
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  border: 2px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.checkbox.checked {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+}
+
+.checkbox.checked::after {
+  content: '✓';
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.checkbox-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+.slider-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  min-width: 130px;
+}
+
+.slider-track {
+  flex: 1;
+  height: 4px;
+  background: var(--bg-input);
+  border-radius: 2px;
+  position: relative;
+}
+
+.slider-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background: var(--accent-blue);
+  border-radius: 2px;
+  width: 70%;
+}
+
+.slider-thumb {
+  position: absolute;
+  top: 50%;
+  left: 70%;
+  transform: translate(-50%, -50%);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent-blue);
+  border: 2px solid white;
+  box-shadow: var(--shadow-sm);
+}
+
+.slider-value {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-blue);
+  min-width: 40px;
+  text-align: right;
+}
+
+.btn-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.btn {
+  padding: 10px 24px;
+  border-radius: var(--radius-md);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-primary {
+  background: var(--accent-blue);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--accent-blue-hover);
+  box-shadow: 0 0 20px rgba(91, 138, 245, 0.3);
+}
+
+.btn-secondary {
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+
+/* ===== SCREEN 2: RESULTS ===== */
+.results-screen { display: flex; flex-direction: column; }
+
+.stats-bar {
+  display: flex;
+  padding: 14px 20px;
+  gap: 2px;
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border);
+}
+
+.stat-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 4px;
+}
+
+.stat-number {
+  font-size: 20px;
+  font-weight: 700;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.stat-label {
+  font-size: 9px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* Duplicate cluster card */
+.cluster-list {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.cluster {
+  border-bottom: 1px solid var(--border);
+  padding: 0;
+}
+
+.cluster:last-child { border-bottom: none; }
+
+.cluster-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  gap: 12px;
+  background: var(--bg-panel-alt);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.cluster-header:hover { background: var(--bg-hover); }
+
+.cluster-confidence {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.confidence-high {
+  background: var(--accent-red-bg);
+  color: var(--accent-red);
+  border: 1px solid rgba(248,113,113,0.2);
+}
+
+.confidence-medium {
+  background: var(--accent-yellow-bg);
+  color: var(--accent-yellow);
+  border: 1px solid rgba(251,191,36,0.2);
+}
+
+.confidence-low {
+  background: var(--accent-blue-bg);
+  color: var(--accent-blue);
+  border: 1px solid rgba(91,138,245,0.2);
+}
+
+.cluster-reason {
+  font-size: 11px;
+  color: var(--text-muted);
+  flex: 1;
+}
+
+.cluster-reason strong { color: var(--text-secondary); }
+
+.cluster-count {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--text-muted);
+  background: var(--bg-input);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.cluster-expand {
+  color: var(--text-muted);
+  font-size: 14px;
+  transition: var(--transition);
+}
+
+.cluster-items {
+  padding: 0 20px 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cluster-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  transition: var(--transition);
+  position: relative;
+}
+
+.cluster-item.canonical {
+  border-color: var(--accent-green);
+  background: rgba(74,222,128,0.04);
+}
+
+.cluster-item:hover {
+  border-color: var(--border-light);
+  background: var(--bg-hover);
+}
+
+.item-radio {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--border-light);
+  flex-shrink: 0;
+  margin-top: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cluster-item.canonical .item-radio {
+  border-color: var(--accent-green);
+  background: var(--accent-green);
+}
+
+.cluster-item.canonical .item-radio::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: white;
+}
+
+.item-content { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+
+.item-title {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.item-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.item-tag {
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tag-type {
+  background: var(--accent-purple-bg);
+  color: var(--accent-purple);
+  border: 1px solid rgba(167,139,250,0.2);
+}
+
+.tag-collections {
+  background: var(--accent-cyan-bg);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(34,211,238,0.2);
+}
+
+.tag-canonical {
+  background: var(--accent-green-bg);
+  color: var(--accent-green);
+  border: 1px solid rgba(74,222,128,0.2);
+}
+
+.item-fields {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-family: 'IBM Plex Mono', monospace;
+  line-height: 1.5;
+}
+
+.field-diff {
+  background: rgba(251,191,36,0.12);
+  color: var(--accent-yellow);
+  padding: 0 3px;
+  border-radius: 2px;
+}
+
+.cluster-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 20px 16px 20px;
+}
+
+.action-btn {
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 600;
+  font-family: 'IBM Plex Sans', sans-serif;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.action-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.action-btn.merge {
+  background: var(--accent-green);
+  color: #1a1a2a;
+  border-color: var(--accent-green);
+  font-weight: 700;
+}
+
+.action-btn.merge:hover {
+  box-shadow: 0 0 16px rgba(74,222,128,0.3);
+}
+
+.action-btn.not-dup {
+  color: var(--accent-yellow);
+  border-color: rgba(251,191,36,0.3);
+}
+
+.action-btn.skip {
+  color: var(--text-muted);
+}
+
+/* Bottom bar */
+.bottom-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: var(--bg-panel);
+  border-top: 1px solid var(--border);
+}
+
+.bottom-info {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* ===== FLOW ARROW ===== */
+.flow-arrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-muted);
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.flow-arrow .arrow {
+  font-size: 20px;
+  color: var(--border-light);
+}
+
+/* ===== SCREEN 3: MERGE PREVIEW ===== */
+.merge-preview {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.merge-grid {
+  display: grid;
+  grid-template-columns: 1fr 40px 1fr;
+  gap: 0;
+  align-items: start;
+}
+
+.merge-source {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.merge-source-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.merge-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: var(--accent-green);
+  padding-top: 40px;
+}
+
+.merge-target {
+  background: rgba(74,222,128,0.04);
+  border: 1px solid var(--accent-green);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.merge-field {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.merge-field-name {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  min-width: 60px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding-top: 2px;
+}
+
+.merge-field-value {
+  font-size: 12px;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.merge-field-value.strikethrough {
+  text-decoration: line-through;
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+.merge-field-toggle {
+  margin-left: auto;
+  font-size: 10px;
+  color: var(--accent-blue);
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 2px 6px;
+  border-radius: 3px;
+  transition: var(--transition);
+}
+
+.merge-field-toggle:hover {
+  background: var(--accent-blue-bg);
+}
+
+/* ===== SCREEN 4: COMPLETE ===== */
+.complete-screen {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.complete-icon { font-size: 48px; }
+
+.complete-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--accent-green);
+}
+
+.complete-summary {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: 1px solid var(--border);
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+}
+
+.summary-row .label { color: var(--text-secondary); }
+
+.summary-row .value {
+  font-weight: 600;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.summary-row .value.green { color: var(--accent-green); }
+.summary-row .value.yellow { color: var(--accent-yellow); }
+.summary-row .value.red { color: var(--accent-red); }
+
+.summary-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 960px) {
+  body { padding: 12px; gap: 20px; }
+  .window, .spec-block { max-width: 100%; }
+  .config-grid { grid-template-columns: 1fr; }
+  .merge-grid { grid-template-columns: 1fr; }
+  .merge-arrow { transform: rotate(90deg); padding: 8px 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- ========================================================================
+     TITLE SECTION
+     ======================================================================== -->
+<div class="section-header">
+  <div class="section-tag">Plugin Zotero Standalone</div>
+  <div class="section-title">ZotDupe — Semantic Duplicate Checker</div>
+  <div class="section-subtitle">
+    Detectare duplicate semantice cross-type in biblioteca Zotero. Gaseste aceeasi sursa salvata 
+    ca tipuri diferite de item (webpage vs statute vs book), cu titluri diferite, metadate diferite, 
+    formatari diferite — si propune merge inteligent cu alegerea item-ului canonical.
+  </div>
+</div>
+
+<!-- ========================================================================
+     SPEC: PROBLEMA SI CONTEXT
+     ======================================================================== -->
+<div class="spec-block">
+  <div class="spec-header">
+    <div class="spec-header-icon" style="background:var(--accent-red-bg);">🎯</div>
+    <div>
+      <div class="spec-header-title">Problema pe care o rezolvam</div>
+      <div class="spec-header-sub">De ce detectorul nativ Zotero si Zoplicate nu sunt suficiente</div>
+    </div>
+  </div>
+  <div class="spec-body">
+    <h4>Detectia nativa Zotero (si Zoplicate)</h4>
+    <p>Zotero foloseste doar <code>DOI</code>, <code>ISBN</code> si <code>titlu exact</code> + an + autori. Zoplicate adauga non-duplicate marking si bulk merge, dar nu schimba algoritmul de detectie. <strong>Ambele detecteaza doar duplicate „triviale".</strong></p>
+    <p>De asemenea, Zotero <strong>nu permite merge intre tipuri diferite de item</strong> (issue #1393, deschis din 2017). Daca ai aceeasi lege salvata ca <code>statute</code> si ca <code>webpage</code>, Zotero nu le vede ca duplicate si nici nu permite merge-ul lor manual.</p>
+
+    <h4>Tipuri de duplicate semantice (invizibile pentru Zotero)</h4>
+
+    <div class="algo-step">
+      <div class="algo-step-num">A</div>
+      <div class="algo-step-text"><strong>Cross-type duplicates:</strong> Aceeasi sursa, tipuri diferite. Ex: Legea 104/2003 ca <code>statute</code>, <code>webpage</code>, <code>legal_case</code> sau <code>report</code>.</div>
+    </div>
+    <div class="algo-step">
+      <div class="algo-step-num">B</div>
+      <div class="algo-step-text"><strong>Title variation duplicates:</strong> Acelasi articol cu titluri diferite. Ex: „GDPR and biobank consent" vs „Regulation 2016/679 implications for biobank research: consent models" vs „GDPR implications for biobank research".</div>
+    </div>
+    <div class="algo-step">
+      <div class="algo-step-num">C</div>
+      <div class="algo-step-text"><strong>Edition/version duplicates:</strong> Editii diferite ale aceleiasi carti: „Principles of Biomedical Ethics, 7th ed." vs „Principles of Biomedical Ethics, 8th ed." — care e un duplicat real vs o editie nou-citabila.</div>
+    </div>
+    <div class="algo-step">
+      <div class="algo-step-num">D</div>
+      <div class="algo-step-text"><strong>Preprint → journal duplicates:</strong> ArXiv preprint + articol publicat in jurnal, cu DOI-uri diferite si titluri usor diferite.</div>
+    </div>
+    <div class="algo-step">
+      <div class="algo-step-num">E</div>
+      <div class="algo-step-text"><strong>Translation duplicates:</strong> Articol in engleza si traducere in romana, sau lege romaneasca cu titlu oficial si titlu tradus in engleza.</div>
+    </div>
+    <div class="algo-step">
+      <div class="algo-step-num">F</div>
+      <div class="algo-step-text"><strong>Legislation duplicates:</strong> Aceeasi lege cu referinte la Monitorul Oficial, la legislatie.just.ro, la forma consolidata, la varianta initiala. Tipuri variate: statute, bill, webpage, document.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================================
+     SPEC: ALGORITM DETECTIE
+     ======================================================================== -->
+<div class="spec-block">
+  <div class="spec-header">
+    <div class="spec-header-icon" style="background:var(--accent-blue-bg);">🧠</div>
+    <div>
+      <div class="spec-header-title">Algoritmul de detectie multi-strat</div>
+      <div class="spec-header-sub">7 nivele de matching cu scoruri de confidenta ponderate</div>
+    </div>
+  </div>
+  <div class="spec-body">
+    <p>Algoritmul combina mai multe semnale intr-un <span class="highlight">scor de similaritate compozit (0.0 — 1.0)</span>. Fiecare strat contribuie un scor partial, ponderat dupa fiabilitate. Doar perechile cu scor &gt; threshold (configurabil, default 0.65) sunt raportate.</p>
+
+    <h4>Strat 1 — Identificator exact (pondere: definitiva)</h4>
+    <p>Daca doua item-uri au acelasi <code>DOI</code>, <code>PMID</code>, <code>PMCID</code> sau <code>ISBN</code> → <span class="green">scor = 1.0, duplicate cert</span>. Normalizare: lowercase, fara prefix „doi:", fara trailing slashes, ISBN fara cratime.</p>
+
+    <h4>Strat 2 — Titlu normalizat + an (pondere: 0.35)</h4>
+    <p>Normalizare titlu: lowercase → remove diacritice → remove punctuatie → collapse whitespace → remove articles (the, a, an, der, die, das) → remove stop words comune. Comparatie: <code>Levenshtein ratio ≥ 0.85</code> SAU <code>Jaccard similarity pe bigrame ≥ 0.75</code>. Bonus +0.10 daca anul este identic (±1 an).</p>
+
+    <h4>Strat 3 — Autori (pondere: 0.20)</h4>
+    <p>Extrage <code>lastName</code> al fiecarui autor. Compara seturile de autori cu Jaccard similarity. Scor partial = Jaccard(autori_A, autori_B). Tratare speciala: entitati institutionale (ex: „Parlamentul Romaniei", „European Commission") — match exact pe text normalizat.</p>
+
+    <h4>Strat 4 — Fingerprint legislativ (pondere: 0.30, doar pentru tipuri juridice)</h4>
+    <p>Extrage din titlu si din campuri un „fingerprint legislativ":</p>
+<pre>Regex: /(legea?|oug|hg|og|ordin|directiva?|regulament|decizie?)\s*(nr\.?\s*)?\d+[\/\-]\d{2,4}/i
+Exemplu: "Legea nr. 104/2003" → fingerprint = "L_104_2003"
+         "Law 104/2003"       → fingerprint = "L_104_2003"
+         "L. 104/2003 M.Of."  → fingerprint = "L_104_2003"</pre>
+    <p>Daca doua item-uri au acelasi fingerprint legislativ → <span class="green">scor_legislativ = 0.95</span>. Se aplica si pe legislatie europeana: <code>Directive 2013/48/EU</code>, <code>Regulation (EU) 2016/679</code>.</p>
+
+    <h4>Strat 5 — URL / acces (pondere: 0.10)</h4>
+    <p>Daca doua item-uri au URL-uri pe acelasi domeniu (ex: ambele pe <code>legislatie.just.ro</code>) si se refera la acelasi act → bonus similaritate. Daca un item e <code>webpage</code> si celalalt <code>statute</code>, dar URL-ul contine ID-ul actului → confirmare.</p>
+
+    <h4>Strat 6 — Preprint ↔ Journal (pondere: bonus 0.15)</h4>
+    <p>Daca un item e de tip <code>preprint</code> sau are DOI ArXiv/bioRxiv/medRxiv, si celalalt e <code>journalArticle</code>, si titlurile au Levenshtein ≥ 0.80 si cel putin un autor comun → se adauga bonus 0.15 la scor.</p>
+
+    <h4>Strat 7 — Traduceri (pondere: context)</h4>
+    <p>Daca titlurile sunt in limbi diferite (detectat cu heuristica: prezenta diacriticelor romanesti, cuvinte cheie de limba) si autorii sunt identici si anul este identic → scor = 0.75 cu tag „posibila traducere". Utilizatorul decide daca le merge sau le lasa separate.</p>
+
+    <h4>Scor final compozit</h4>
+<pre>scor = max(
+  scor_identificator,                              // Strat 1 (definitiv daca = 1.0)
+  W_titlu * scor_titlu                             // Strat 2
+  + W_autori * scor_autori                         // Strat 3
+  + W_legislativ * scor_legislativ                 // Strat 4
+  + W_url * scor_url                               // Strat 5
+  + bonus_preprint                                 // Strat 6
+)
+// W_titlu=0.35, W_autori=0.20, W_legislativ=0.30, W_url=0.10
+// Normalizat la [0, 1]</pre>
+
+    <h4>Clasificare confidenta</h4>
+    <ul>
+      <li><span class="red">≥ 0.90 — Very High</span> — Propunere auto-merge (cu confirmare)</li>
+      <li><span class="yellow">0.75 — 0.89 — High</span> — Probabil duplicat, necesita confirmare</li>
+      <li><span class="highlight">0.65 — 0.74 — Medium</span> — Posibil duplicat, revizuire manuala</li>
+      <li>Sub 0.65 — Nu este raportat (configurabil)</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ========================================================================
+     SPEC: STRUCTURI DE DATE
+     ======================================================================== -->
+<div class="spec-block">
+  <div class="spec-header">
+    <div class="spec-header-icon" style="background:var(--accent-cyan-bg);">💾</div>
+    <div>
+      <div class="spec-header-title">Structuri de date si performanta</div>
+      <div class="spec-header-sub">Indexare si comparatii optime pentru biblioteci mari</div>
+    </div>
+  </div>
+  <div class="spec-body">
+    <h4>Indexare la startup (o singura trecere)</h4>
+<pre>interface NormalizedItem {
+  id: number;                    // Zotero item ID
+  key: string;                   // Zotero item key
+  itemType: string;              // "journalArticle", "statute", "webpage", etc.
+  titleNorm: string;             // titlu normalizat (lowercase, fara diacritice/punctuatie)
+  titleBigrams: Set&lt;string&gt;;     // set de bigrame pentru Jaccard
+  authorLastNames: Set&lt;string&gt;;  // set de nume de familie normalizate
+  year: number | null;
+  doi: string | null;            // normalizat
+  pmid: string | null;
+  isbn: string | null;
+  url: string | null;
+  urlDomain: string | null;
+  legalFingerprint: string|null; // ex: "L_104_2003", "DIR_2013_48_EU"
+  collections: string[];         // IDs de colectii
+  tags: string[];
+  dateAdded: string;
+  attachmentCount: number;
+  noteCount: number;
+}
+
+interface DuplicateCluster {
+  id: string;                    // cluster ID unic
+  items: NormalizedItem[];       // 2+ item-uri in cluster
+  canonicalId: number | null;    // item ales ca master
+  score: number;                 // scor de similaritate maxim in cluster
+  confidence: "very_high" | "high" | "medium";
+  reasons: string[];             // ex: ["DOI exact match", "Cross-type: statute ↔ webpage"]
+  matchDetails: {
+    layer: number;               // stratul care a produs match-ul
+    titleSim: number;
+    authorSim: number;
+    legalMatch: boolean;
+    urlMatch: boolean;
+    crossType: boolean;
+    preprint: boolean;
+  };
+  status: "pending" | "merged" | "not_duplicate" | "skipped";
+}</pre>
+
+    <h4>Strategie de comparatie (evitarea O(n²))</h4>
+    <p>Pentru o biblioteca de N item-uri, comparatia naiva este O(N²). Cu N=20.000, asta inseamna 200M de comparatii — prea lent. Solutia:</p>
+
+    <div class="algo-step">
+      <div class="algo-step-num">1</div>
+      <div class="algo-step-text"><strong>Blocking prin identificatori:</strong> Construieste hashmap-uri pe DOI, PMID, ISBN. Orice coliziune = pereche candidata. Complexitate: O(N).</div>
+    </div>
+    <div class="algo-step">
+      <div class="algo-step-num">2</div>
+      <div class="algo-step-text"><strong>Blocking prin fingerprint legislativ:</strong> Hashmap pe fingerprint-uri. Orice coliziune = pereche candidata. O(N).</div>
+    </div>
+    <div class="algo-step">
+      <div class="algo-step-num">3</div>
+      <div class="algo-step-text"><strong>Blocking prin Year + FirstAuthor:</strong> Grupeaza item-urile dupa (an, primul autor). Compara doar in cadrul fiecarui grup. Reduce dramatic numarul de perechi.</div>
+    </div>
+    <div class="algo-step">
+      <div class="algo-step-num">4</div>
+      <div class="algo-step-text"><strong>MinHash LSH pe bigrame de titlu:</strong> Locality-Sensitive Hashing cu 128 de hash-uri si 8 bande. Gaseste rapid perechi cu Jaccard estimat ≥ 0.5 pe titlu. Complexitate: ~O(N).</div>
+    </div>
+    <div class="algo-step">
+      <div class="algo-step-num">5</div>
+      <div class="algo-step-text"><strong>Scoring complet:</strong> Doar pe perechile candidate din pasii 1-4. Aplica toate cele 7 straturi. Filtreaza sub threshold.</div>
+    </div>
+
+    <p><strong>Performanta estimata:</strong> Biblioteca de 20.000 item-uri: <span class="green">indexare ~2s</span>, <span class="green">comparatii ~3-5s</span>, <span class="green">total &lt; 8s</span>.</p>
+  </div>
+</div>
+
+<!-- ========================================================================
+     SPEC: MERGE LOGIC
+     ======================================================================== -->
+<div class="spec-block">
+  <div class="spec-header">
+    <div class="spec-header-icon" style="background:var(--accent-green-bg);">🔀</div>
+    <div>
+      <div class="spec-header-title">Logica de merge cross-type</div>
+      <div class="spec-header-sub">Cum se alege itemul canonical si cum se combina metadatele</div>
+    </div>
+  </div>
+  <div class="spec-body">
+    <h4>Selectia automata a item-ului canonical</h4>
+    <p>Plugin-ul propune un item „master" pe baza unui scor de calitate:</p>
+<pre>qualityScore(item) = 
+    (item.doi ? 20 : 0)
+  + (item.isbn ? 15 : 0)
+  + (item.pmid ? 15 : 0)
+  + (item.abstract ? 10 : 0)
+  + (item.url ? 5 : 0)
+  + (item.attachmentCount * 5)    // PDF-uri atasate
+  + (item.noteCount * 3)          // note
+  + (item.collections.length * 2) // apartine la colectii
+  + (item.tags.length * 1)        // tag-uri
+  + typeBonus(item.itemType)      // bonus pentru tipuri "corecte"
+  + (item.dateAdded &lt; other.dateAdded ? 5 : 0)  // item-ul mai vechi</pre>
+    
+    <p><code>typeBonus()</code> acorda punctaj preferential tipurilor mai specifice:</p>
+    <ul>
+      <li><code>journalArticle</code>: +10, <code>book</code>: +10, <code>statute</code>: +10</li>
+      <li><code>conferencePaper</code>: +8, <code>thesis</code>: +8, <code>report</code>: +6</li>
+      <li><code>preprint</code>: +4, <code>webpage</code>: +2, <code>document</code>: +1</li>
+    </ul>
+    <p>Utilizatorul poate schimba item-ul canonical cu un click.</p>
+
+    <h4>Combinarea metadatelor la merge</h4>
+    <p>Reguli per camp:</p>
+    <ul>
+      <li><strong>Type:</strong> Se pastreaza tipul canonical (utilizatorul poate schimba)</li>
+      <li><strong>Title:</strong> Se pastreaza cel mai complet (cel mai lung, cu diacritice)</li>
+      <li><strong>DOI/PMID/ISBN:</strong> Se pastreaza orice identificator non-null</li>
+      <li><strong>Abstract:</strong> Se pastreaza cel mai lung</li>
+      <li><strong>URL:</strong> Se pastreaza (daca canonical nu are URL dar sursa da)</li>
+      <li><strong>Collections:</strong> UNION — item-ul rezultat apartine tuturor colectiilor</li>
+      <li><strong>Tags:</strong> UNION — toate tag-urile se pastreaza</li>
+      <li><strong>Notes:</strong> Se muta toate notele la item-ul canonical</li>
+      <li><strong>Attachments:</strong> Se muta toate PDF-urile la canonical. Daca exista PDF-uri identice (hash), se pastreaza unul singur</li>
+      <li><strong>Related:</strong> UNION — relatiile se combina</li>
+      <li><strong>Extra:</strong> Se concateneaza daca ambele au continut</li>
+    </ul>
+    <p>Fiecare camp cu valori diferite este afisat in UI cu optiunea de a alege sursa.</p>
+
+    <h4>Tratarea merge cross-type (workaround Zotero)</h4>
+    <p>Deoarece Zotero nativ nu permite merge intre tipuri diferite (issue #1393):</p>
+    <div class="algo-step">
+      <div class="algo-step-num">1</div>
+      <div class="algo-step-text">Se schimba tipul item-urilor non-canonice la tipul canonical (via <code>Zotero.Item.setType()</code>)</div>
+    </div>
+    <div class="algo-step">
+      <div class="algo-step-num">2</div>
+      <div class="algo-step-text">Se face merge-ul standard Zotero (pastreaza colectii, tag-uri, atasamente, citari)</div>
+    </div>
+    <div class="algo-step">
+      <div class="algo-step-num">3</div>
+      <div class="algo-step-text">Citarile din documente Word se actualizeaza automat (Zotero face asta nativ la merge)</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================================
+     MOCKUP: ECRAN 1 — CONFIGURARE SCAN
+     ======================================================================== -->
+<div class="screen-label">Ecran 1 — Configurare scanare</div>
+<div class="window">
+  <div class="window-titlebar">
+    <div class="window-dots">
+      <div class="window-dot red"></div>
+      <div class="window-dot yellow"></div>
+      <div class="window-dot green"></div>
+    </div>
+    <div class="window-title"><span class="icon">🔍</span>ZotDupe — Semantic Duplicate Checker</div>
+    <div style="width:54px"></div>
+  </div>
+  <div class="window-body">
+    <div class="scan-config">
+      <div class="plugin-header">
+        <div class="plugin-logo"><span>ZD</span></div>
+        <div class="plugin-info">
+          <div class="plugin-name">ZotDupe</div>
+          <div class="plugin-version">v1.0.0 · Semantic Duplicate Checker</div>
+        </div>
+      </div>
+
+      <div class="config-section">
+        <div class="config-label">Scopul scanarii</div>
+        <div class="config-grid">
+          <div class="config-card selected">
+            <div class="config-radio"></div>
+            <div class="config-card-text">
+              <div class="config-card-title">📚 Biblioteca intreaga</div>
+              <div class="config-card-desc">Scaneaza toate cele 2.847 item-uri din My Library</div>
+            </div>
+          </div>
+          <div class="config-card">
+            <div class="config-radio"></div>
+            <div class="config-card-text">
+              <div class="config-card-title">📁 Colectia curenta</div>
+              <div class="config-card-desc">Doar item-urile din „Bioethics Treatise v2" (342 item-uri)</div>
+            </div>
+          </div>
+          <div class="config-card">
+            <div class="config-radio"></div>
+            <div class="config-card-text">
+              <div class="config-card-title">🏷️ Tag-uri selectate</div>
+              <div class="config-card-desc">Filtreaza scanarea dupa tag-uri specifice</div>
+            </div>
+          </div>
+          <div class="config-card">
+            <div class="config-radio"></div>
+            <div class="config-card-text">
+              <div class="config-card-title">🆕 Item-uri recente</div>
+              <div class="config-card-desc">Compara item-urile adaugate in ultimele 30 de zile cu restul</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="config-section">
+        <div class="config-label">Tipuri de duplicate cautate</div>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <div class="checkbox-row">
+            <div class="checkbox checked"></div>
+            <div class="checkbox-label">Identificatori exacti (DOI, PMID, ISBN) — <em>mereu activ</em></div>
+          </div>
+          <div class="checkbox-row">
+            <div class="checkbox checked"></div>
+            <div class="checkbox-label">Titluri similare + autori comuni (fuzzy matching)</div>
+          </div>
+          <div class="checkbox-row">
+            <div class="checkbox checked"></div>
+            <div class="checkbox-label">Cross-type duplicates (ex: statute ↔ webpage ↔ document)</div>
+          </div>
+          <div class="checkbox-row">
+            <div class="checkbox checked"></div>
+            <div class="checkbox-label">Fingerprint legislativ (legi, OUG, HG, directive EU)</div>
+          </div>
+          <div class="checkbox-row">
+            <div class="checkbox checked"></div>
+            <div class="checkbox-label">Preprint → articol publicat (ArXiv, bioRxiv, medRxiv)</div>
+          </div>
+          <div class="checkbox-row">
+            <div class="checkbox"></div>
+            <div class="checkbox-label">Traduceri posibile (aceiasi autori, an identic, limba diferita)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="config-section">
+        <div class="config-label">Prag de similaritate</div>
+        <div class="slider-row">
+          <div class="slider-label">Threshold minim:</div>
+          <div class="slider-track">
+            <div class="slider-fill"></div>
+            <div class="slider-thumb"></div>
+          </div>
+          <div class="slider-value">0.70</div>
+        </div>
+        <div style="font-size:10px; color:var(--text-muted); margin-top:-4px; padding-left:142px;">
+          Mai mic = mai multe rezultate (inclusiv false pozitive) · Mai mare = doar duplicate certe
+        </div>
+      </div>
+
+      <div class="config-section">
+        <div class="config-label">Optiuni</div>
+        <div class="checkbox-row">
+          <div class="checkbox checked"></div>
+          <div class="checkbox-label">Exclude perechile deja marcate ca non-duplicate (Zoplicate)</div>
+        </div>
+        <div class="checkbox-row">
+          <div class="checkbox checked"></div>
+          <div class="checkbox-label">Pre-selecteaza item-ul canonical cu cele mai multe metadate</div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary">Anuleaza</button>
+        <button class="btn btn-primary">🔍 Scaneaza 2.847 item-uri</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FLOW ARROW -->
+<div class="flow-arrow">
+  <span>scanare: 6.2s · 2.847 item-uri · 47 clustere gasite</span>
+  <span class="arrow">↓</span>
+</div>
+
+<!-- ========================================================================
+     MOCKUP: ECRAN 2 — REZULTATE
+     ======================================================================== -->
+<div class="screen-label">Ecran 2 — Clustere de duplicate</div>
+<div class="window">
+  <div class="window-titlebar">
+    <div class="window-dots">
+      <div class="window-dot red"></div>
+      <div class="window-dot yellow"></div>
+      <div class="window-dot green"></div>
+    </div>
+    <div class="window-title"><span class="icon">🔍</span>ZotDupe — 47 clustere de duplicate gasite</div>
+    <div style="width:54px"></div>
+  </div>
+  <div class="window-body">
+    <div class="results-screen">
+
+      <!-- STATS BAR -->
+      <div class="stats-bar">
+        <div class="stat-item">
+          <div class="stat-number" style="color:var(--text-primary)">47</div>
+          <div class="stat-label">Clustere</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" style="color:var(--text-primary)">112</div>
+          <div class="stat-label">Item-uri implicate</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" style="color:var(--accent-red)">8</div>
+          <div class="stat-label">Confidenta f. mare</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" style="color:var(--accent-yellow)">23</div>
+          <div class="stat-label">Confidenta mare</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" style="color:var(--accent-blue)">16</div>
+          <div class="stat-label">Confidenta medie</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" style="color:var(--accent-purple)">14</div>
+          <div class="stat-label">Cross-type</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" style="color:var(--accent-orange)">5</div>
+          <div class="stat-label">Legislatie</div>
+        </div>
+      </div>
+
+      <!-- CLUSTER LIST -->
+      <div class="cluster-list">
+
+        <!-- ===== CLUSTER 1: Legislatie — cross-type ===== -->
+        <div class="cluster">
+          <div class="cluster-header">
+            <span class="cluster-confidence confidence-high">● 0.97</span>
+            <span class="cluster-reason"><strong>Fingerprint legislativ:</strong> L_104_2003 · Cross-type: statute ↔ webpage ↔ document</span>
+            <span class="cluster-count">3 item-uri</span>
+            <span class="cluster-expand">▾</span>
+          </div>
+          <div class="cluster-items">
+            <!-- Item A (canonical) -->
+            <div class="cluster-item canonical">
+              <div class="item-radio"></div>
+              <div class="item-content">
+                <div class="item-title">Legea nr. 104/2003 privind manipularea cadavrelor umane și prelevarea organelor și țesuturilor de la cadavre</div>
+                <div class="item-meta">
+                  <span class="item-tag tag-type">statute</span>
+                  <span class="item-tag tag-canonical">★ CANONICAL</span>
+                  <span class="item-tag tag-collections">2 colecții</span>
+                  <span>Parlamentul României · 2003 · 1 PDF</span>
+                </div>
+                <div class="item-fields">
+                  codeNumber: 104/2003 · session: M.Of. 476/2003 · URL: legislatie.just.ro
+                </div>
+              </div>
+            </div>
+            <!-- Item B -->
+            <div class="cluster-item">
+              <div class="item-radio"></div>
+              <div class="item-content">
+                <div class="item-title">Lege 104 din 25 aprilie 2003 privind manipularea cadavrelor umane</div>
+                <div class="item-meta">
+                  <span class="item-tag tag-type">webpage</span>
+                  <span class="item-tag tag-collections">1 colecție</span>
+                  <span>2003 · 0 PDF · snapshot</span>
+                </div>
+                <div class="item-fields">
+                  URL: <span class="field-diff">https://legislatie.just.ro/Public/DetaliiDocument/42917</span>
+                </div>
+              </div>
+            </div>
+            <!-- Item C -->
+            <div class="cluster-item">
+              <div class="item-radio"></div>
+              <div class="item-content">
+                <div class="item-title">L. 104/2003 M.Of. 476/2003</div>
+                <div class="item-meta">
+                  <span class="item-tag tag-type">document</span>
+                  <span>2003 · 0 PDF · 2 note</span>
+                </div>
+                <div class="item-fields">
+                  extra: <span class="field-diff">Formă consolidată la data de 15.03.2024</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="cluster-actions">
+            <button class="action-btn merge">🔀 Merge → Canonical</button>
+            <button class="action-btn not-dup">Nu sunt duplicate</button>
+            <button class="action-btn skip">Mai tarziu</button>
+          </div>
+        </div>
+
+        <!-- ===== CLUSTER 2: Preprint → Journal ===== -->
+        <div class="cluster">
+          <div class="cluster-header">
+            <span class="cluster-confidence confidence-high">● 0.93</span>
+            <span class="cluster-reason"><strong>Preprint → jurnal:</strong> Titlu similar (92%) + 3 autori comuni + DOI-uri diferite</span>
+            <span class="cluster-count">2 item-uri</span>
+            <span class="cluster-expand">▾</span>
+          </div>
+          <div class="cluster-items">
+            <div class="cluster-item canonical">
+              <div class="item-radio"></div>
+              <div class="item-content">
+                <div class="item-title">AI-driven skeletal age estimation: a multi-center validation study</div>
+                <div class="item-meta">
+                  <span class="item-tag tag-type">journalArticle</span>
+                  <span class="item-tag tag-canonical">★ CANONICAL</span>
+                  <span>Navega D, Cunha E, Hostiuc S et al. · 2024 · Forensic Science International</span>
+                </div>
+                <div class="item-fields">
+                  DOI: 10.1016/j.forsciint.2024.112045 · PMID: 38491234 · 1 PDF
+                </div>
+              </div>
+            </div>
+            <div class="cluster-item">
+              <div class="item-radio"></div>
+              <div class="item-content">
+                <div class="item-title">AI-driven skeletal age estimation: a multi-center validation</div>
+                <div class="item-meta">
+                  <span class="item-tag tag-type">preprint</span>
+                  <span>Navega D, Cunha E, Hostiuc S et al. · 2023</span>
+                </div>
+                <div class="item-fields">
+                  DOI: <span class="field-diff">10.1101/2023.09.15.557012</span> · URL: biorxiv.org · 1 PDF (draft)
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="cluster-actions">
+            <button class="action-btn merge">🔀 Merge → Canonical</button>
+            <button class="action-btn not-dup">Nu sunt duplicate</button>
+            <button class="action-btn skip">Mai tarziu</button>
+          </div>
+        </div>
+
+        <!-- ===== CLUSTER 3: Book editions ===== -->
+        <div class="cluster">
+          <div class="cluster-header">
+            <span class="cluster-confidence confidence-medium">● 0.78</span>
+            <span class="cluster-reason"><strong>Titlu similar + autori identici:</strong> Posibil editii diferite — necesita revizuire</span>
+            <span class="cluster-count">2 item-uri</span>
+            <span class="cluster-expand">▾</span>
+          </div>
+          <div class="cluster-items">
+            <div class="cluster-item canonical">
+              <div class="item-radio"></div>
+              <div class="item-content">
+                <div class="item-title">Principles of Biomedical Ethics, 8th Edition</div>
+                <div class="item-meta">
+                  <span class="item-tag tag-type">book</span>
+                  <span class="item-tag tag-canonical">★ CANONICAL</span>
+                  <span>Beauchamp TL, Childress JF · 2019 · Oxford University Press</span>
+                </div>
+                <div class="item-fields">
+                  ISBN: <span class="field-diff">978-0190640873</span> · edition: 8th · 2 PDF
+                </div>
+              </div>
+            </div>
+            <div class="cluster-item">
+              <div class="item-radio"></div>
+              <div class="item-content">
+                <div class="item-title">Principles of Biomedical Ethics</div>
+                <div class="item-meta">
+                  <span class="item-tag tag-type">book</span>
+                  <span>Beauchamp TL, Childress JF · <span class="field-diff">2013</span> · Oxford University Press</span>
+                </div>
+                <div class="item-fields">
+                  ISBN: <span class="field-diff">978-0199924585</span> · edition: <span class="field-diff">7th</span> · 1 PDF
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="cluster-actions">
+            <button class="action-btn merge">🔀 Merge → Canonical</button>
+            <button class="action-btn not-dup" style="border-color:rgba(251,191,36,0.5); color:var(--accent-yellow); font-weight:700;">⚠ Editii diferite — Nu merge!</button>
+            <button class="action-btn skip">Mai tarziu</button>
+          </div>
+        </div>
+
+        <!-- ===== CLUSTER 4: Same article, webpage vs journal ===== -->
+        <div class="cluster">
+          <div class="cluster-header">
+            <span class="cluster-confidence confidence-high">● 0.91</span>
+            <span class="cluster-reason"><strong>DOI identic:</strong> 10.1186/s12910-023-00927-y · Cross-type: journalArticle ↔ webpage</span>
+            <span class="cluster-count">2 item-uri</span>
+            <span class="cluster-expand">▸</span>
+          </div>
+        </div>
+
+        <!-- ===== More clusters collapsed ===== -->
+        <div class="cluster">
+          <div class="cluster-header">
+            <span class="cluster-confidence confidence-medium">● 0.72</span>
+            <span class="cluster-reason"><strong>Titlu similar (87%) + an identic:</strong> Cross-type: report ↔ conferencePaper</span>
+            <span class="cluster-count">2 item-uri</span>
+            <span class="cluster-expand">▸</span>
+          </div>
+        </div>
+
+        <div style="text-align:center; padding:14px; color:var(--text-muted); font-size:11px; font-style:italic; border-top: 1px solid var(--border);">
+          ... inca 42 clustere (8 very high, 19 high, 15 medium) ...
+        </div>
+      </div>
+
+      <!-- BOTTOM BAR -->
+      <div class="bottom-bar">
+        <div class="bottom-info">
+          Filtru: <strong style="color:var(--text-primary)">Toate</strong> ·
+          <span style="cursor:pointer; color:var(--accent-red)">Very High (8)</span> ·
+          <span style="cursor:pointer;">High (23)</span> ·
+          <span style="cursor:pointer;">Medium (16)</span> ·
+          <span style="cursor:pointer; color:var(--accent-purple)">Cross-type (14)</span> ·
+          <span style="cursor:pointer; color:var(--accent-orange)">Legislatie (5)</span>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-secondary">Export raport</button>
+          <button class="btn btn-primary">🔀 Merge toate Very High (8)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FLOW ARROW -->
+<div class="flow-arrow">
+  <span>utilizatorul confirma merge</span>
+  <span class="arrow">↓</span>
+</div>
+
+<!-- ========================================================================
+     MOCKUP: ECRAN 3 — MERGE PREVIEW
+     ======================================================================== -->
+<div class="screen-label">Ecran 3 — Preview merge (detaliu per cluster)</div>
+<div class="window">
+  <div class="window-titlebar">
+    <div class="window-dots">
+      <div class="window-dot red"></div>
+      <div class="window-dot yellow"></div>
+      <div class="window-dot green"></div>
+    </div>
+    <div class="window-title"><span class="icon">🔀</span>ZotDupe — Merge Preview: Legea 104/2003</div>
+    <div style="width:54px"></div>
+  </div>
+  <div class="window-body">
+    <div class="merge-preview">
+
+      <div style="font-size:13px; color:var(--text-secondary); line-height:1.6;">
+        Se vor combina <strong style="color:var(--text-primary)">3 item-uri</strong> intr-unul singur.
+        Colectiile, tag-urile, notele si atasamentele se pastreaza din toate sursele.
+        Selecteaza valoarea preferata pentru campurile cu diferente:
+      </div>
+
+      <div class="merge-grid">
+        <!-- SOURCE -->
+        <div class="merge-source">
+          <div class="merge-source-label" style="color:var(--accent-red);">✕ Se sterg (2 item-uri)</div>
+          <div class="merge-field">
+            <div class="merge-field-name">Tip</div>
+            <div class="merge-field-value strikethrough">webpage, document</div>
+          </div>
+          <div class="merge-field">
+            <div class="merge-field-name">Titlu</div>
+            <div class="merge-field-value strikethrough" style="font-size:11px;">Lege 104 din 25 aprilie 2003...<br>L. 104/2003 M.Of. 476/2003</div>
+          </div>
+          <div class="merge-field">
+            <div class="merge-field-name">Note</div>
+            <div class="merge-field-value" style="font-size:10px;">2 note → se muta la canonical</div>
+          </div>
+          <div class="merge-field">
+            <div class="merge-field-name">Colectii</div>
+            <div class="merge-field-value" style="font-size:10px;">1 colectie → se adauga la canonical</div>
+          </div>
+          <div class="merge-field">
+            <div class="merge-field-name">Snapshot</div>
+            <div class="merge-field-value" style="font-size:10px;">1 snapshot → se muta la canonical</div>
+          </div>
+        </div>
+
+        <!-- ARROW -->
+        <div class="merge-arrow">→</div>
+
+        <!-- TARGET -->
+        <div class="merge-target">
+          <div class="merge-source-label" style="color:var(--accent-green);">★ Item canonical (se pastreaza)</div>
+          <div class="merge-field">
+            <div class="merge-field-name">Tip</div>
+            <div class="merge-field-value"><strong>statute</strong></div>
+          </div>
+          <div class="merge-field">
+            <div class="merge-field-name">Titlu</div>
+            <div class="merge-field-value" style="font-size:11px;">Legea nr. 104/2003 privind manipularea cadavrelor umane și prelevarea organelor și țesuturilor de la cadavre</div>
+            <div class="merge-field-toggle">↻ alege alt titlu</div>
+          </div>
+          <div class="merge-field">
+            <div class="merge-field-name">An</div>
+            <div class="merge-field-value">2003</div>
+          </div>
+          <div class="merge-field">
+            <div class="merge-field-name">Colectii</div>
+            <div class="merge-field-value" style="color:var(--accent-green); font-size:11px;">3 colectii (uniune)</div>
+          </div>
+          <div class="merge-field">
+            <div class="merge-field-name">Note</div>
+            <div class="merge-field-value" style="color:var(--accent-green); font-size:11px;">2 note (mutate)</div>
+          </div>
+          <div class="merge-field">
+            <div class="merge-field-name">Ataș.</div>
+            <div class="merge-field-value" style="color:var(--accent-green); font-size:11px;">1 PDF + 1 snapshot</div>
+          </div>
+          <div class="merge-field">
+            <div class="merge-field-name">Extra</div>
+            <div class="merge-field-value" style="color:var(--accent-green); font-size:11px;">+ „Formă consolidată la data de 15.03.2024"</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:var(--accent-orange-bg); border:1px solid rgba(251,146,60,0.2); border-radius:var(--radius-md); padding:10px 14px; display:flex; gap:8px; align-items:flex-start;">
+        <span style="font-size:14px; flex-shrink:0;">⚠️</span>
+        <span style="font-size:11px; color:var(--accent-orange); line-height:1.5;">
+          <strong>Citari in documente:</strong> Daca ai documente Word cu citari la item-urile sterse, Zotero va redirectiona automat citatiile catre item-ul canonical la urmatorul „Refresh" din Word.
+        </span>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary">◂ Inapoi</button>
+        <button class="btn btn-primary" style="background:var(--accent-green);">✓ Confirma merge</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FLOW ARROW -->
+<div class="flow-arrow">
+  <span>merge complet</span>
+  <span class="arrow">↓</span>
+</div>
+
+<!-- ========================================================================
+     MOCKUP: ECRAN 4 — REZULTAT FINAL
+     ======================================================================== -->
+<div class="screen-label">Ecran 4 — Raport final sesiune</div>
+<div class="window">
+  <div class="window-titlebar">
+    <div class="window-dots">
+      <div class="window-dot red"></div>
+      <div class="window-dot yellow"></div>
+      <div class="window-dot green"></div>
+    </div>
+    <div class="window-title"><span class="icon">✅</span>ZotDupe — Sesiune finalizata</div>
+    <div style="width:54px"></div>
+  </div>
+  <div class="window-body">
+    <div class="complete-screen">
+      <div class="complete-icon">✅</div>
+      <div class="complete-title">Sesiune de curatare finalizata</div>
+
+      <div class="complete-summary">
+        <div class="summary-row">
+          <span class="label">Clustere procesate</span>
+          <span class="value green">47 / 47</span>
+        </div>
+        <div class="summary-divider"></div>
+        <div class="summary-row">
+          <span class="label">Merge efectuat</span>
+          <span class="value green">31</span>
+        </div>
+        <div class="summary-row">
+          <span class="label">Marcat „nu e duplicat"</span>
+          <span class="value yellow">9</span>
+        </div>
+        <div class="summary-row">
+          <span class="label">Sarit (mai tarziu)</span>
+          <span class="value" style="color:var(--text-muted)">7</span>
+        </div>
+        <div class="summary-divider"></div>
+        <div class="summary-row">
+          <span class="label">Item-uri sterse (merge)</span>
+          <span class="value red">38</span>
+        </div>
+        <div class="summary-row">
+          <span class="label">Item-uri ramase in biblioteca</span>
+          <span class="value">2.809</span>
+        </div>
+        <div class="summary-divider"></div>
+        <div class="summary-row">
+          <span class="label">Merge cross-type</span>
+          <span class="value" style="color:var(--accent-purple);">11</span>
+        </div>
+        <div class="summary-row">
+          <span class="label">Merge legislatie</span>
+          <span class="value" style="color:var(--accent-orange);">4</span>
+        </div>
+        <div class="summary-row">
+          <span class="label">Merge preprint → jurnal</span>
+          <span class="value" style="color:var(--accent-cyan);">3</span>
+        </div>
+        <div class="summary-divider"></div>
+        <div class="summary-row">
+          <span class="label">Timp total</span>
+          <span class="value">6.2s scan + 4.1s merge</span>
+        </div>
+      </div>
+
+      <div style="font-size:11px; color:var(--text-muted); text-align:center; max-width:400px; line-height:1.5;">
+        Notă: Item-urile șterse se află în Trash. Le poți restaura oricând din Zotero → Trash → Restore to Library.
+        Cele 7 clustere sárite vor fi afișate la următoarea scanare.
+      </div>
+
+      <div class="btn-row" style="justify-content:center;">
+        <button class="btn btn-secondary">📋 Copiaza raport</button>
+        <button class="btn btn-primary">Inchide</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================================
+     SPEC: DEZVOLTARE SI LIMITARI
+     ======================================================================== -->
+<div class="spec-block">
+  <div class="spec-header">
+    <div class="spec-header-icon" style="background:var(--accent-yellow-bg);">🛠️</div>
+    <div>
+      <div class="spec-header-title">Plan de dezvoltare, limitari si integrari</div>
+      <div class="spec-header-sub">Estimari de efort, faze de implementare, edge cases</div>
+    </div>
+  </div>
+  <div class="spec-body">
+    <h4>Faze de implementare</h4>
+    <div class="algo-step" style="border-left-color: var(--accent-green);">
+      <div class="algo-step-num" style="color:var(--accent-green);">F1</div>
+      <div class="algo-step-text"><strong>MVP (3-4 saptamani):</strong> Indexare + blocking DOI/ISBN + titlu fuzzy + UI de baza (lista clustere + merge simplu). Doar same-type merge.</div>
+    </div>
+    <div class="algo-step" style="border-left-color: var(--accent-yellow);">
+      <div class="algo-step-num" style="color:var(--accent-yellow);">F2</div>
+      <div class="algo-step-text"><strong>Cross-type + legislatie (2-3 saptamani):</strong> Fingerprint legislativ + cross-type merge workaround + preprint→jurnal + MinHash LSH.</div>
+    </div>
+    <div class="algo-step" style="border-left-color: var(--accent-purple);">
+      <div class="algo-step-num" style="color:var(--accent-purple);">F3</div>
+      <div class="algo-step-text"><strong>UI complet + optiuni avansate (2 saptamani):</strong> Merge preview + field picker + traduceri + export raport + integrare Zoplicate (non-dup pairs).</div>
+    </div>
+    <div class="algo-step" style="border-left-color: var(--accent-cyan);">
+      <div class="algo-step-num" style="color:var(--accent-cyan);">F4</div>
+      <div class="algo-step-text"><strong>Optimizare + testare (2 saptamani):</strong> Benchmark pe biblioteci reale 5k/20k/50k. Tuning threshold-uri. Edge cases. Packaging XPI + documentatie.</div>
+    </div>
+
+    <h4>Efort total estimat: 35-45 zile-om</h4>
+
+    <h4>Limitari cunoscute</h4>
+    <ul>
+      <li><strong>Nu inlocuieste judecata umana:</strong> Editiile diferite (7th vs 8th) NU trebuie merge-uite. Plugin-ul semnaleaza dar utilizatorul decide.</li>
+      <li><strong>MinHash LSH are false negatives:</strong> ~5-10% din perechi cu Jaccard real &gt; 0.5 pot fi ratate. Acceptabil, deoarece blocking-ul pe ID-uri le prinde pe cele importante.</li>
+      <li><strong>Cross-type merge pierde campuri specifice tipului:</strong> Daca merge statute → webpage, campurile specifice statute (codeNumber, session) se pierd daca target-ul e webpage. Solutie: mereu merge catre tipul mai specific.</li>
+      <li><strong>Traduceri sunt dificil de detectat automat:</strong> Fara un API de traducere, detectia se bazeaza pe heuristici (limba detectata din caractere + autori identici). False positive rate mai mare.</li>
+      <li><strong>Zotero nu are API public de „merge":</strong> Merge-ul se face prin metode interne Zotero (<code>Zotero.Items.merge()</code>), care pot evolua intre versiuni.</li>
+    </ul>
+
+    <h4>Compatibilitate</h4>
+    <ul>
+      <li><strong>Zotero 7+</strong> (obligatoriu, utilizeaza API-ul modern)</li>
+      <li><strong>Zoplicate:</strong> Compatibil — respecta perechile non-duplicate marcate. Poate importa lista de non-duplicates de la Zoplicate si invers.</li>
+      <li><strong>PP2Zotero:</strong> Poate fi invocat automat dupa conversia Paperpile → Zotero, pentru a detecta duplicatele create la import.</li>
+    </ul>
+
+    <h4>Integrare cu PP2Zotero (hook optional)</h4>
+    <p>Dupa o conversie PP2Zotero, item-urile importate din DOI pot fi duplicate cu item-uri existente. ZotDupe poate rula automat o scanare limitata doar pe item-urile nou-importate, oferind merge instant.</p>
+  </div>
+</div>
+
+<div style="text-align:center; padding:20px; font-size:11px; color:var(--text-muted); max-width:600px; line-height:1.5;">
+  ZotDupe · Specificații tehnice + Mockup UI · Februarie 2026<br>
+  Plugin Zotero standalone · Compatibil Zotero 7+ · Open-source
+</div>
+
+</body>
+</html>
