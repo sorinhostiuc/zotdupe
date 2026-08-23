@@ -1,108 +1,110 @@
-<?xml version="1.0"?>
-<?xml-stylesheet href="config-dialog.css" type="text/css"?>
-<window xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-        xmlns:html="http://www.w3.org/1999/xhtml"
-        title="ZotDupe — Semantic Duplicate Detector"
-        width="560" height="420"
-        onload="ZotDupeConfigDialog.init();">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="UTF-8" />
+  <title>ZotDupe — Semantic Duplicate Detector</title>
+  <link rel="stylesheet" href="config-dialog.css" />
+</head>
+<body>
 
-  <html:div id="zotdupe-config-root">
+  <div id="zotdupe-config-root">
 
     <!-- Header -->
-    <html:div id="zotdupe-header">
-      <html:div id="zotdupe-header-logo">
-        <html:svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="36" height="36">
-          <html:rect x="2" y="2" width="44" height="44" rx="8" ry="8" fill="#5C6BC0"/>
-          <html:text x="24" y="32" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="bold" fill="white" text-anchor="middle">ZD</html:text>
-        </html:svg>
-      </html:div>
-      <html:div id="zotdupe-header-text">
-        <html:span id="zotdupe-title">ZotDupe</html:span>
-        <html:span id="zotdupe-subtitle">Semantic Duplicate Detector</html:span>
-      </html:div>
-      <html:span id="zotdupe-version">v1.0.0</html:span>
-    </html:div>
+    <div id="zotdupe-header">
+      <div id="zotdupe-header-logo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="36" height="36">
+          <rect x="2" y="2" width="44" height="44" rx="8" ry="8" fill="#5C6BC0"/>
+          <text x="24" y="32" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="bold" fill="white" text-anchor="middle">ZD</text>
+        </svg>
+      </div>
+      <div id="zotdupe-header-text">
+        <span id="zotdupe-title">ZotDupe</span>
+        <span id="zotdupe-subtitle">Semantic Duplicate Detector</span>
+      </div>
+      <span id="zotdupe-version">v2.4.1</span>
+    </div>
 
     <!-- Section: Scope -->
-    <html:div class="zotdupe-section">
-      <html:label class="zotdupe-section-label">Ce să scanez?</html:label>
-      <html:div class="zotdupe-radio-group">
-        <html:label class="zotdupe-radio-label">
-          <html:input type="radio" name="scope" value="library" checked="checked"
-                      onchange="ZotDupeConfigDialog.onScopeChange();" />
-          <html:span id="zotdupe-scope-library-text">Întreaga bibliotecă (<html:span id="zotdupe-item-count">…</html:span> itemi)</html:span>
-        </html:label>
-        <html:label class="zotdupe-radio-label">
-          <html:input type="radio" name="scope" value="collection"
-                      onchange="ZotDupeConfigDialog.onScopeChange();" />
-          <html:span>Doar colecția:</html:span>
-          <html:select id="zotdupe-collection-select" disabled="disabled">
-            <html:option value="">— selectează —</html:option>
-          </html:select>
-        </html:label>
-      </html:div>
-    </html:div>
+    <div class="zotdupe-section">
+      <label class="zotdupe-section-label">What to scan?</label>
+      <div class="zotdupe-radio-group">
+        <label class="zotdupe-radio-label">
+          <input type="radio" name="scope" value="library" checked="checked"
+                 onchange="ZotDupeConfigDialog.onScopeChange();" />
+          <span id="zotdupe-scope-library-text">Entire library (<span id="zotdupe-item-count">…</span> items)</span>
+        </label>
+        <label class="zotdupe-radio-label">
+          <input type="radio" name="scope" value="collection"
+                 onchange="ZotDupeConfigDialog.onScopeChange();" />
+          <span>Collection only:</span>
+          <button id="zotdupe-collection-btn" disabled="disabled"
+                  onclick="ZotDupeConfigDialog.onPickCollection();">— select —</button>
+        </label>
+      </div>
+    </div>
 
     <!-- Section: Threshold -->
-    <html:div class="zotdupe-section">
-      <html:label class="zotdupe-section-label">Sensibilitatea detecției</html:label>
-      <html:div id="zotdupe-threshold-row">
-        <html:span class="zotdupe-slider-label">Strict</html:span>
-        <html:input type="range" id="zotdupe-threshold-slider" min="0" max="2" step="1" value="1"
-                    oninput="ZotDupeConfigDialog.onThresholdChange(this.value);" />
-        <html:span class="zotdupe-slider-label">Relaxat</html:span>
-      </html:div>
-      <html:div id="zotdupe-threshold-desc">Pragul curent: ≥ 0.75 — Va detecta duplicate probabile și sigure.</html:div>
-    </html:div>
+    <div class="zotdupe-section">
+      <label class="zotdupe-section-label">Detection sensitivity</label>
+      <div id="zotdupe-threshold-row">
+        <span class="zotdupe-slider-label">Strict</span>
+        <input type="range" id="zotdupe-threshold-slider" min="0" max="2" step="1" value="1"
+               oninput="ZotDupeConfigDialog.onThresholdChange(this.value);" />
+        <span class="zotdupe-slider-label">Relaxed</span>
+      </div>
+      <div id="zotdupe-threshold-desc">Current threshold: ≥ 0.75 — Will detect probable and sure duplicates.</div>
+    </div>
 
     <!-- Section: Advanced Options (collapsible) -->
-    <html:div class="zotdupe-section">
-      <html:div class="zotdupe-collapsible-header" onclick="ZotDupeConfigDialog.toggleAdvanced();">
-        <html:span id="zotdupe-advanced-indicator">▶</html:span>
-        <html:label class="zotdupe-section-label zotdupe-section-label-inline">Opțiuni avansate</html:label>
-      </html:div>
-      <html:div id="zotdupe-advanced-body" class="zotdupe-collapsed">
-        <html:label class="zotdupe-checkbox-label">
-          <html:input type="checkbox" id="zotdupe-opt-legal" checked="checked" />
-          <html:span>Potrivire prin amprentă legală (ISBN, DOI, PMID etc.)</html:span>
-        </html:label>
-        <html:label class="zotdupe-checkbox-label">
-          <html:input type="checkbox" id="zotdupe-opt-preprint" checked="checked" />
-          <html:span>Detectare preprint → articol publicat</html:span>
-        </html:label>
-        <html:label class="zotdupe-checkbox-label">
-          <html:input type="checkbox" id="zotdupe-opt-translation" />
-          <html:span>Detectare traduceri (aceeași lucrare în limbi diferite)</html:span>
-        </html:label>
-        <html:label class="zotdupe-checkbox-label">
-          <html:input type="checkbox" id="zotdupe-opt-crosstype" checked="checked" />
-          <html:span>Potrivire între tipuri diferite (conferință vs. jurnal etc.)</html:span>
-        </html:label>
-        <html:label class="zotdupe-checkbox-label">
-          <html:input type="checkbox" id="zotdupe-opt-minhash" />
-          <html:span>MinHash LSH (potrivire aproximativă pentru biblioteci mari)</html:span>
-        </html:label>
-      </html:div>
-    </html:div>
+    <div class="zotdupe-section">
+      <div class="zotdupe-collapsible-header" onclick="ZotDupeConfigDialog.toggleAdvanced();">
+        <span id="zotdupe-advanced-indicator">&#x25B6;</span>
+        <label class="zotdupe-section-label zotdupe-section-label-inline">Advanced options</label>
+      </div>
+      <div id="zotdupe-advanced-body" class="zotdupe-collapsed">
+        <label class="zotdupe-checkbox-label">
+          <input type="checkbox" id="zotdupe-opt-legal" checked="checked" />
+          <span>Legal fingerprint matching (ISBN, DOI, PMID etc.)</span>
+        </label>
+        <label class="zotdupe-checkbox-label">
+          <input type="checkbox" id="zotdupe-opt-preprint" checked="checked" />
+          <span>Preprint detection → published article</span>
+        </label>
+        <label class="zotdupe-checkbox-label">
+          <input type="checkbox" id="zotdupe-opt-translation" />
+          <span>Translation detection (same work in different languages)</span>
+        </label>
+        <label class="zotdupe-checkbox-label">
+          <input type="checkbox" id="zotdupe-opt-crosstype" checked="checked" />
+          <span>Cross-type matching (conference vs. journal etc.)</span>
+        </label>
+        <label class="zotdupe-checkbox-label">
+          <input type="checkbox" id="zotdupe-opt-minhash" />
+          <span>MinHash LSH (approximate matching for large libraries)</span>
+        </label>
+      </div>
+    </div>
 
     <!-- Progress (hidden until scan starts) -->
-    <html:div id="zotdupe-progress" style="display:none;">
-      <html:div id="zotdupe-progress-status">Se scanează...</html:div>
-      <html:div id="zotdupe-progress-bar-container">
-        <html:div id="zotdupe-progress-bar-fill"></html:div>
-      </html:div>
-    </html:div>
+    <div id="zotdupe-progress" style="display:none;">
+      <div id="zotdupe-progress-status">Scanning...</div>
+      <div id="zotdupe-progress-bar-container">
+        <div id="zotdupe-progress-bar-fill"></div>
+      </div>
+    </div>
 
     <!-- Bottom -->
-    <html:div id="zotdupe-footer">
-      <html:div id="zotdupe-estimate">Durată estimată: <html:span id="zotdupe-estimate-text">se calculează…</html:span></html:div>
-      <html:div id="zotdupe-buttons">
-        <html:button id="zotdupe-btn-cancel" onclick="ZotDupeConfigDialog.onCancel();">Anulează</html:button>
-        <html:button id="zotdupe-btn-scan" onclick="ZotDupeConfigDialog.onScan();">Scanează</html:button>
-      </html:div>
-    </html:div>
+    <div id="zotdupe-footer">
+      <div id="zotdupe-estimate">Estimated duration: <span id="zotdupe-estimate-text">calculating…</span></div>
+      <div id="zotdupe-buttons">
+        <button id="zotdupe-btn-cancel" onclick="ZotDupeConfigDialog.onCancel();">Cancel</button>
+        <button id="zotdupe-btn-scan" onclick="ZotDupeConfigDialog.onScan();">Scan</button>
+      </div>
+    </div>
 
-  </html:div>
+  </div>
 
-  <script src="config-dialog.js"/>
-</window>
+  <script src="config-dialog.js" />
+</body>
+</html>

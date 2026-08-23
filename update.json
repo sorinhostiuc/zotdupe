@@ -1,0 +1,19 @@
+{
+  "addons": {
+    "zotdupe@hostiuc.com": {
+      "updates": [
+        {
+          "version": "2.4.1",
+          "update_link": "https://github.com/sorinhostiuc/zotdupe/releases/download/v2.4.1/zotdupe-2.4.1.xpi",
+          "update_hash": "sha256:2d0fcbecb45b9346ba46845d80f6c7c45ab0f88ad0baa9b5c91d2aa55578d05a",
+          "applications": {
+            "zotero": {
+              "strict_min_version": "6.999",
+              "strict_max_version": "9.*"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

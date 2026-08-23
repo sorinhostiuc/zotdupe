@@ -102,18 +102,25 @@
   accent-color: #5C6BC0;
 }
 
-#zotdupe-collection-select {
+#zotdupe-collection-btn {
   margin-left: 4px;
-  padding: 3px 8px;
+  padding: 3px 12px;
   font-size: 12px;
   border: 1px solid #CCC;
   border-radius: 4px;
   background: #FAFAFA;
   max-width: 240px;
-  transition: outline 0.2s ease;
+  cursor: pointer;
+  font-family: inherit;
+  transition: outline 0.2s ease, background 0.15s;
 }
 
-#zotdupe-collection-select:disabled {
+#zotdupe-collection-btn:hover:not(:disabled) {
+  background: #E8EAF6;
+  border-color: #5C6BC0;
+}
+
+#zotdupe-collection-btn:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }

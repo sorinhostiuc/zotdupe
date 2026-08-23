@@ -69,7 +69,7 @@ console.log('=== computeScore ===');
 (function () {
     var score = computeScore({ layer6: 0.85 });
     assert(score >= 0.70, 'Preprint detection 0.85 should yield score >= 0.70, got ' + score);
-    assertApprox(score, 0.85 * 0.85, 0.001, 'Preprint: 0.85 * 0.85 = 0.7225');
+    assertApprox(score, 0.85, 0.001, 'Preprint-only score keeps its normalized value');
 })();
 
 // Translation low ceiling: layer7=0.70 -> score <= 0.70

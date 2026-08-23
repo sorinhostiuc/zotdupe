@@ -2,7 +2,7 @@
 <?xml-stylesheet href="results-panel.css" type="text/css"?>
 <window xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
         xmlns:html="http://www.w3.org/1999/xhtml"
-        title="ZotDupe — Rezultate scanare"
+        title="ZotDupe — Scan Results"
         width="880" height="650"
         onload="ZotDupeResults.init();">
   <html:div id="zotdupe-results-root">
@@ -11,35 +11,51 @@
     <html:div id="zotdupe-stats-bar">
       <html:div class="zotdupe-stat-card" id="stat-scanned">
         <html:span class="stat-number" style="color:#333333">0</html:span>
-        <html:span class="stat-label">Items scanate</html:span>
+        <html:span class="stat-label">Items scanned</html:span>
       </html:div>
       <html:div class="zotdupe-stat-card" id="stat-clusters">
         <html:span class="stat-number" style="color:#5C6BC0">0</html:span>
-        <html:span class="stat-label">Clustere</html:span>
+        <html:span class="stat-label">Clusters</html:span>
       </html:div>
       <html:div class="zotdupe-stat-card" id="stat-sure">
         <html:span class="stat-number" style="color:#388E3C">0</html:span>
-        <html:span class="stat-label">Sigure ≥0.95</html:span>
+        <html:span class="stat-label">Sure ≥0.95</html:span>
       </html:div>
       <html:div class="zotdupe-stat-card" id="stat-probable">
         <html:span class="stat-number" style="color:#FF8F00">0</html:span>
-        <html:span class="stat-label">Probabile 0.80–0.94</html:span>
+        <html:span class="stat-label">Probable 0.80–0.94</html:span>
       </html:div>
       <html:div class="zotdupe-stat-card" id="stat-possible">
         <html:span class="stat-number" style="color:#EF5350">0</html:span>
-        <html:span class="stat-label">Posibile 0.60–0.79</html:span>
+        <html:span class="stat-label">Possible 0.60–0.79</html:span>
       </html:div>
     </html:div>
 
     <!-- ========== Filter Bar ========== -->
     <html:div id="zotdupe-filter-bar">
       <html:div class="zotdupe-filter-chips">
-        <html:button class="zotdupe-chip active" data-filter="all" onclick="ZotDupeResults.onFilterChange('all')">Toate: <html:span class="chip-count" id="chip-all">0</html:span></html:button>
-        <html:button class="zotdupe-chip chip-sure" data-filter="sure" onclick="ZotDupeResults.onFilterChange('sure')">Sigure: <html:span class="chip-count" id="chip-sure">0</html:span></html:button>
-        <html:button class="zotdupe-chip chip-probable" data-filter="probable" onclick="ZotDupeResults.onFilterChange('probable')">Probabile: <html:span class="chip-count" id="chip-probable">0</html:span></html:button>
-        <html:button class="zotdupe-chip chip-possible" data-filter="possible" onclick="ZotDupeResults.onFilterChange('possible')">Posibile: <html:span class="chip-count" id="chip-possible">0</html:span></html:button>
+        <html:button class="zotdupe-chip active" data-filter="all" onclick="ZotDupeResults.onFilterChange('all')">All: <html:span class="chip-count" id="chip-all">0</html:span></html:button>
+        <html:button class="zotdupe-chip chip-sure" data-filter="sure" onclick="ZotDupeResults.onFilterChange('sure')">Sure: <html:span class="chip-count" id="chip-sure">0</html:span></html:button>
+        <html:button class="zotdupe-chip chip-probable" data-filter="probable" onclick="ZotDupeResults.onFilterChange('probable')">Probable: <html:span class="chip-count" id="chip-probable">0</html:span></html:button>
+        <html:button class="zotdupe-chip chip-possible" data-filter="possible" onclick="ZotDupeResults.onFilterChange('possible')">Possible: <html:span class="chip-count" id="chip-possible">0</html:span></html:button>
       </html:div>
-      <html:input type="text" id="zotdupe-search" placeholder="Caută în clustere..." oninput="ZotDupeResults.onSearch(this.value)"/>
+      <html:input type="text" id="zotdupe-search" placeholder="Search clusters..." oninput="ZotDupeResults.onSearch(this.value)"/>
+      <html:button id="zotdupe-lib-search-btn" class="zotdupe-chip" onclick="ZotDupeResults.onLibrarySearch();" title="Search entire library by keywords and create a manual cluster">Library Search</html:button>
+    </html:div>
+
+    <!-- ========== Library Search Panel (hidden) ========== -->
+    <html:div id="zotdupe-lib-search-panel" style="display:none;">
+      <html:div id="lib-search-header">
+        <html:input type="text" id="lib-search-input" placeholder="Enter keywords (e.g. legea 46/2003)..." />
+        <html:button id="lib-search-go" onclick="ZotDupeResults.onLibSearchGo();">Search</html:button>
+        <html:button id="lib-search-close" onclick="ZotDupeResults.onLibSearchClose();">✕</html:button>
+      </html:div>
+      <html:div id="lib-search-status" style="display:none;"></html:div>
+      <html:div id="lib-search-results"></html:div>
+      <html:div id="lib-search-actions" style="display:none;">
+        <html:span id="lib-search-selected-count">0 selected</html:span>
+        <html:button id="lib-search-create-cluster" onclick="ZotDupeResults.onLibSearchCreateCluster();">Create Cluster</html:button>
+      </html:div>
     </html:div>
 
     <!-- ========== Cluster List (scrollable) ========== -->
@@ -50,11 +66,11 @@
     <!-- ========== Bottom Bar ========== -->
     <html:div id="zotdupe-bottom-bar">
       <html:div class="bottom-left">
-        <html:span id="zotdupe-resolved-label">Clustere rezolvate: 0/0</html:span>
+        <html:span id="zotdupe-resolved-label">Clusters resolved: 0/0</html:span>
       </html:div>
       <html:div class="bottom-right">
-        <html:button id="btn-auto-merge" class="btn-auto-merge" onclick="ZotDupeResults.onAutoMergeAllSure()">Merge automat toate sigure (<html:span id="auto-merge-count">0</html:span>)</html:button>
-        <html:button id="btn-close" class="btn-close" onclick="ZotDupeResults.onClose()">Închide</html:button>
+        <html:button id="btn-auto-merge" class="btn-auto-merge" onclick="ZotDupeResults.onAutoMergeAllSure()">Auto-merge all sure (<html:span id="auto-merge-count">0</html:span>)</html:button>
+        <html:button id="btn-close" class="btn-close" onclick="ZotDupeResults.onClose()">Close</html:button>
       </html:div>
     </html:div>
 

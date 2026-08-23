@@ -327,7 +327,7 @@ ZotDupe.scan = async function (options) {
     var progress = opts.onProgress || function () {};
 
     // Step a: Get items
-    progress({phase: "indexing", message: "Se construiește indexul...", progress: 0});
+    progress({phase: "indexing", message: "Building index...", progress: 0});
     var zoteroItems;
     if (opts.collectionID) {
         var collection = Zotero.Collections.get(opts.collectionID);
@@ -341,7 +341,7 @@ ZotDupe.scan = async function (options) {
         return item.isRegularItem && item.isRegularItem();
     });
 
-    progress({phase: "indexing", message: "Se convertesc " + zoteroItems.length + " itemi...", progress: 0.05});
+    progress({phase: "indexing", message: "Converting" + zoteroItems.length + " items...", progress: 0.05});
 
     // Step b: Convert to plain objects
     var plainItems = [];
@@ -359,7 +359,7 @@ ZotDupe.scan = async function (options) {
     }
 
     // Step c: Build blocking index
-    progress({phase: "indexing", message: "Se construiește indexul de blocare...", progress: 0.1});
+    progress({phase: "indexing", message: "Building blocking index...", progress: 0.1});
     var blocks = ZotDupe.Blocker.buildBlocks(plainItems);
 
     // Step d: Get candidate pairs from blocking
@@ -367,7 +367,7 @@ ZotDupe.scan = async function (options) {
 
     // Step d2: If MinHash enabled, add LSH candidates
     if (opts.enableMinHash && ZotDupe.MinHash) {
-        progress({phase: "indexing", message: "Se calculează candidații MinHash LSH...", progress: 0.15});
+        progress({phase: "indexing", message: "Computing MinHash LSH candidates...", progress: 0.15});
         var lshPairs = ZotDupe.MinHash.lshCandidates(plainItems);
         // Merge LSH pairs into candidate set (deduplicate)
         var seen = {};
@@ -390,7 +390,7 @@ ZotDupe.scan = async function (options) {
 
     // Step e-f: Scan and score each pair
     var totalPairs = candidatePairs.length;
-    progress({phase: "scanning", message: "Se compară perechile: 0/" + totalPairs + "...", progress: 0.2});
+    progress({phase: "scanning", message: "Comparing pairs:0/" + totalPairs + "...", progress: 0.2});
     var thresholdValue = ZotDupe.Scorer.getThresholdValue(threshold);
     var scoredPairs = [];
 
@@ -434,16 +434,16 @@ ZotDupe.scan = async function (options) {
 
         // Progress every 500 pairs
         if (s % 500 === 0 && s > 0) {
-            progress({phase: "scanning", message: "Se compară perechile: " + s + "/" + totalPairs + "...", progress: 0.2 + (s / totalPairs) * 0.6});
+            progress({phase: "scanning", message: "Comparing pairs:" + s + "/" + totalPairs + "...", progress: 0.2 + (s / totalPairs) * 0.6});
         }
     }
 
     // Step i: Cluster
-    progress({phase: "clustering", message: "Se grupează rezultatele...", progress: 0.8});
+    progress({phase: "clustering", message: "Clustering results...", progress: 0.8});
     var clusters = ZotDupe.clusterPairs(scoredPairs);
 
     // Step j: Select canonical for each cluster, classify
-    progress({phase: "scoring", message: "Se calculează scorurile...", progress: 0.9});
+    progress({phase: "scoring", message: "Computing scores...", progress: 0.9});
     for (var ci = 0; ci < clusters.length; ci++) {
         var cluster = clusters[ci];
         var clusterItems = [];
@@ -479,7 +479,7 @@ ZotDupe.scan = async function (options) {
         scanTimeMs: Date.now() - startTime
     };
 
-    progress({phase: "done", message: "Scanare completă!", progress: 1.0});
+    progress({phase: "done", message: "Scan complete!", progress: 1.0});
 
     return { clusters: clusters, stats: stats };
 };
@@ -494,9 +494,10 @@ ZotDupe.scan = async function (options) {
  * @param {object} cluster - { ids, canonicalId, ... }
  * @param {number} canonicalId - ID of the item to keep
  * @param {object} zoteroItems - Map of id -> Zotero.Item
+ * @param {object} [fieldSelections] - { fieldName: itemId } cherry-picked fields
  * @returns {Promise<object>} Merge result
  */
-ZotDupe.mergeCluster = async function (cluster, canonicalId, zoteroItems) {
+ZotDupe.mergeCluster = async function (cluster, canonicalId, zoteroItems, fieldSelections) {
     var masterItem = zoteroItems[canonicalId];
     if (!masterItem) {
         throw new Error('Canonical item not found: ' + canonicalId);
@@ -512,6 +513,31 @@ ZotDupe.mergeCluster = async function (cluster, canonicalId, zoteroItems) {
 
     if (duplicateItems.length === 0) {
         return { merged: false, reason: 'No duplicates to merge' };
+    }
+
+    // Apply field selections: copy chosen field values to master before merge
+    if (fieldSelections && typeof fieldSelections === 'object') {
+        var needSave = false;
+        for (var fieldName in fieldSelections) {
+            if (!fieldSelections.hasOwnProperty(fieldName)) continue;
+            var sourceId = fieldSelections[fieldName];
+            // Skip if the selection is already the master
+            if (sourceId === canonicalId || String(sourceId) === String(canonicalId)) continue;
+            var sourceItem = zoteroItems[sourceId];
+            if (!sourceItem) continue;
+            try {
+                var val = sourceItem.getField(fieldName);
+                if (val !== undefined && val !== null) {
+                    masterItem.setField(fieldName, val);
+                    needSave = true;
+                }
+            } catch (fieldErr) {
+                // Field may not exist on this item type — skip silently
+            }
+        }
+        if (needSave) {
+            await masterItem.saveTx();
+        }
     }
 
     // Cross-type: change duplicate types to match canonical if needed
@@ -536,12 +562,14 @@ ZotDupe.mergeCluster = async function (cluster, canonicalId, zoteroItems) {
         }
     }
 
-    // Execute merge inside a transaction
-    var result = await Zotero.DB.executeTransaction(async function () {
-        return Zotero.Items.merge(masterItem, duplicateItems);
-    });
-
-    return { merged: true, result: result };
+    // Execute merge
+    try {
+        var result = await Zotero.Items.merge(masterItem, duplicateItems);
+        return { merged: true, result: result };
+    } catch (mergeErr) {
+        Zotero.logError('[ZotDupe] Merge failed for canonical ' + canonicalId + ': ' + mergeErr);
+        throw mergeErr;
+    }
 };
 
 // ============================================================

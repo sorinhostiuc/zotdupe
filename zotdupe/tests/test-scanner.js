@@ -393,7 +393,7 @@ var S = ZotDupe.Scanner;
         {DOI: '10.1234/abc', title: 'Paper X', date: '2020'},
         {DOI: '10.1234/abc', title: 'Paper X', date: '2020'}
     );
-    assertEq(r.matchType, 'DOI identic', 'scanPair: DOI match type');
+    assertEq(r.matchType, 'Identical DOI', 'scanPair: DOI match type');
     assertEq(r.scores.layer1, 1.0, 'scanPair: DOI score');
 
     // ISBN match (no DOI)
@@ -401,21 +401,21 @@ var S = ZotDupe.Scanner;
         {ISBN: '978-0-306-40615-7', title: 'Book X', date: '2020'},
         {ISBN: '0-306-40615-2', title: 'Book X', date: '2020'}
     );
-    assertEq(r.matchType, 'ISBN identic', 'scanPair: ISBN match type');
+    assertEq(r.matchType, 'Identical ISBN', 'scanPair: ISBN match type');
 
     // PMID match
     r = S.scanPair(
         {PMID: '99999', title: 'Study Y', date: '2020'},
         {PMID: '99999', title: 'Study Y', date: '2020'}
     );
-    assertEq(r.matchType, 'PMID identic', 'scanPair: PMID match type');
+    assertEq(r.matchType, 'Identical PMID', 'scanPair: PMID match type');
 
     // Title + year only (no identifiers)
     r = S.scanPair(
         {title: 'Neural Network Applications', date: '2021'},
         {title: 'Neural Network Applications', date: '2021'}
     );
-    assertEq(r.matchType, 'Titlu similar + an', 'scanPair: title+year match type');
+    assertEq(r.matchType, 'Similar title + year', 'scanPair: title+year match type');
     assertEq(r.scores.layer2, 0.95, 'scanPair: title+year score');
 
     // Legal fingerprint
@@ -430,7 +430,7 @@ var S = ZotDupe.Scanner;
         {title: 'Different Title A', url: 'https://example.com/paper'},
         {title: 'Different Title B', url: 'http://example.com/paper'}
     );
-    assertEq(r.matchType, 'URL identic', 'scanPair: URL match type');
+    assertEq(r.matchType, 'Identical URL', 'scanPair: URL match type');
 
     // Preprint detection
     r = S.scanPair(

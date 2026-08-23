@@ -1,14 +1,16 @@
 {
   "manifest_version": 2,
   "name": "ZotDupe",
-  "version": "1.0.0",
+  "version": "2.4.1",
   "description": "Semantic duplicate detector for Zotero",
   "author": "Sorin Hostiuc",
+  "homepage_url": "https://github.com/sorinhostiuc/zotdupe",
   "applications": {
     "zotero": {
-      "id": "zotdupe@zotero-plugins.org",
+      "id": "zotdupe@hostiuc.com",
+      "update_url": "https://raw.githubusercontent.com/sorinhostiuc/zotdupe/main/update.json",
       "strict_min_version": "6.999",
-      "strict_max_version": "7.0.*"
+      "strict_max_version": "9.*"
     }
   }
 }

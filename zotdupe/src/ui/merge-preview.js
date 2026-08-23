@@ -1,5 +1,7 @@
 /* eslint-env mozilla/browser-window */
-/* global Zotero, ZotDupe, window, document */
+var _io = window.arguments ? window.arguments[0] : null;
+var Zotero = _io ? _io.Zotero : (typeof Zotero !== 'undefined' ? Zotero : null);
+var ZotDupe = _io ? _io.ZotDupe : (typeof ZotDupe !== 'undefined' ? ZotDupe : null);
 
 /**
  * ZotDupe — Merge Preview Dialog (Screen 3)
@@ -26,6 +28,7 @@ var ZotDupeMergePreview = {
     duplicateItems: [],
     allItems: [],
     fieldSelections: {},  // { fieldName: itemId } — which item's value to keep
+    excludedIds: new Set(), // IDs of items excluded from merge
 
     // Fields to compare (common across most types)
     COMPARE_FIELDS: [
@@ -42,44 +45,44 @@ var ZotDupeMergePreview = {
 
     // ── Human-readable field labels ────────────────────────────
     FIELD_LABELS: {
-        title: 'Titlu',
-        date: 'Data',
+        title: 'Title',
+        date: 'Date',
         DOI: 'DOI',
         ISBN: 'ISBN',
         ISSN: 'ISSN',
         url: 'URL',
-        publicationTitle: 'Publicatie',
+        publicationTitle: 'Publication',
         abstractNote: 'Abstract',
-        language: 'Limba',
-        publisher: 'Editor',
-        place: 'Loc',
-        volume: 'Volum',
-        issue: 'Numar',
-        pages: 'Pagini',
+        language: 'Language',
+        publisher: 'Publisher',
+        place: 'Place',
+        volume: 'Volume',
+        issue: 'Issue',
+        pages: 'Pages',
         extra: 'Extra',
-        shortTitle: 'Titlu scurt',
-        rights: 'Drepturi',
-        archive: 'Arhiva',
-        archiveLocation: 'Loc. arhiva',
-        callNumber: 'Cota',
+        shortTitle: 'Short title',
+        rights: 'Rights',
+        archive: 'Archive',
+        archiveLocation: 'Archive loc.',
+        callNumber: 'Call number',
         libraryCatalog: 'Catalog',
-        accessDate: 'Data accesare',
-        numPages: 'Nr. pagini',
-        edition: 'Editia',
-        series: 'Serie',
-        seriesNumber: 'Nr. serie',
-        bookTitle: 'Titlu carte',
-        proceedingsTitle: 'Titlu proc.',
-        conferenceName: 'Conferinta',
-        thesisType: 'Tip teza',
-        university: 'Universitate',
-        reportNumber: 'Nr. raport',
-        reportType: 'Tip raport',
-        institution: 'Institutie',
-        repository: 'Depozit',
-        archiveID: 'ID arhiva',
-        websiteTitle: 'Titlu site',
-        websiteType: 'Tip site'
+        accessDate: 'Access date',
+        numPages: 'Num. pages',
+        edition: 'Edition',
+        series: 'Series',
+        seriesNumber: 'Series no.',
+        bookTitle: 'Book title',
+        proceedingsTitle: 'Proc. title',
+        conferenceName: 'Conference',
+        thesisType: 'Thesis type',
+        university: 'University',
+        reportNumber: 'Report no.',
+        reportType: 'Report type',
+        institution: 'Institution',
+        repository: 'Repository',
+        archiveID: 'Archive ID',
+        websiteTitle: 'Website title',
+        websiteType: 'Website type'
     },
 
     // ===========================================================
@@ -165,21 +168,44 @@ var ZotDupeMergePreview = {
 
         // ── Build header row ──
         var headerRow = document.createElement('tr');
+        var self = this;
 
         var thField = document.createElement('th');
         thField.className = 'col-field';
-        thField.textContent = 'Camp';
+        thField.textContent = 'Field';
         headerRow.appendChild(thField);
 
         var thMaster = document.createElement('th');
         thMaster.className = 'col-master';
-        thMaster.textContent = 'Itemul canonical (MASTER)';
+        thMaster.innerHTML = '<span class="col-header-text">Canonical (MASTER)</span>';
         headerRow.appendChild(thMaster);
 
         for (var d = 0; d < dups.length; d++) {
             var thDup = document.createElement('th');
-            thDup.className = 'col-dup';
-            thDup.textContent = 'Duplicat ' + (d + 1);
+            var dupId = dups[d]._zotdupeId;
+            var isExcluded = this.excludedIds.has(dupId);
+            thDup.className = 'col-dup' + (isExcluded ? ' col-excluded' : '');
+            thDup.setAttribute('data-col-index', String(d + 1));
+
+            // Include checkbox for duplicates (only if 3+ items total)
+            if (this.allItems.length > 2) {
+                var cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.className = 'col-include-cb';
+                cb.checked = !isExcluded;
+                cb.title = isExcluded ? 'Include in merge' : 'Exclude from merge';
+                (function (itemId, cbEl) {
+                    cbEl.addEventListener('change', function () {
+                        self.onToggleInclude(itemId, cbEl.checked);
+                    });
+                })(dupId, cb);
+                thDup.appendChild(cb);
+            }
+
+            var dupLabel = document.createElement('span');
+            dupLabel.className = 'col-header-text';
+            dupLabel.textContent = ' Duplicate ' + (d + 1);
+            thDup.appendChild(dupLabel);
             headerRow.appendChild(thDup);
         }
 
@@ -188,7 +214,6 @@ var ZotDupeMergePreview = {
         // ── Gather all field names present across items ──
         var fieldSet = {};
         var fieldOrder = [];
-        var self = this;
 
         // Start with the compare fields in defined order
         for (var f = 0; f < this.COMPARE_FIELDS.length; f++) {
@@ -238,8 +263,8 @@ var ZotDupeMergePreview = {
             if (hasValue) activeFields.push(fname);
         }
 
-        // ── Special row: Tip item ──
-        this._addSpecialRow(tbody, 'Tip item', allItemsList, function (item) {
+        // ── Special row: Item type ──
+        this._addSpecialRow(tbody, 'Item type', allItemsList, function (item) {
             return item.itemType || '—';
         }, false);
 
@@ -253,13 +278,13 @@ var ZotDupeMergePreview = {
             return self._formatTags(item.tags);
         }, true);
 
-        // ── Special row: Atasamente ──
-        this._addSpecialRow(tbody, 'Atasamente', allItemsList, function (item) {
+        // ── Special row: Attachments ──
+        this._addSpecialRow(tbody, 'Attachments', allItemsList, function (item) {
             return self._formatAttachments(item);
         }, true);
 
-        // ── Special row: Colectii ──
-        this._addSpecialRow(tbody, 'Colectii', allItemsList, function (item) {
+        // ── Special row: Collections ──
+        this._addSpecialRow(tbody, 'Collections', allItemsList, function (item) {
             return self._formatCollections(item);
         }, true);
     },
@@ -310,10 +335,10 @@ var ZotDupeMergePreview = {
             // Missing on master, present on duplicate
             if (isMaster && masterEmpty && anyDupHasValue) {
                 td.classList.add('cell-missing-on-master');
-                td.innerHTML = '<span class="empty-value">(gol)</span>';
+                td.innerHTML = '<span class="empty-value">(empty)</span>';
             } else if (!isMaster && !masterEmpty && cellVal === '') {
                 // Duplicate has no value
-                td.innerHTML = '<span class="empty-value">(gol)</span>';
+                td.innerHTML = '<span class="empty-value">(empty)</span>';
             } else if (!isMaster && masterEmpty && cellVal !== '') {
                 // Duplicate has value, master doesn't
                 td.classList.add('cell-missing-on-master');
@@ -323,23 +348,29 @@ var ZotDupeMergePreview = {
                 td.appendChild(plusSpan);
                 td.appendChild(document.createTextNode(this._truncate(cellVal, 200)));
             } else if (cellVal === '') {
-                td.innerHTML = '<span class="empty-value">(gol)</span>';
+                td.innerHTML = '<span class="empty-value">(empty)</span>';
             } else {
                 td.textContent = this._truncate(cellVal, 200);
             }
 
-            // Make clickable if values differ
-            if (!allIdentical && cellVal !== '') {
+            // Check if this item is excluded
+            var isExcluded = this.excludedIds.has(itemId);
+            if (isExcluded) {
+                td.classList.add('cell-excluded');
+            }
+
+            // Make clickable if values differ and item is not excluded
+            if (!allIdentical && cellVal !== '' && !isExcluded) {
                 td.classList.add('cell-selectable');
 
-                // Default selection: master value if non-empty, else first non-empty dup
+                // Default selection: master value if non-empty, else first non-empty included dup
                 if (!this.fieldSelections[fieldName]) {
                     if (masterVal !== '') {
                         this.fieldSelections[fieldName] = master._zotdupeId;
                     } else {
-                        // Find first dup with a value
                         for (var fd = 0; fd < dups.length; fd++) {
-                            if (this._getFieldValue(dups[fd], fieldName) !== '') {
+                            if (this._getFieldValue(dups[fd], fieldName) !== '' &&
+                                !this.excludedIds.has(dups[fd]._zotdupeId)) {
                                 this.fieldSelections[fieldName] = dups[fd]._zotdupeId;
                                 break;
                             }
@@ -399,11 +430,11 @@ var ZotDupeMergePreview = {
             }
 
             // Cross-type indicator for Tip item row
-            if (label === 'Tip item' && i > 0 && allItems[i].itemType !== masterType) {
+            if (label === 'Item type' && i > 0 && allItems[i].itemType !== masterType) {
                 tr.className = 'row-different';
                 var note = document.createElement('div');
                 note.className = 'type-change-note';
-                note.textContent = '(se va schimba)';
+                note.textContent = '(will be changed)';
                 td.appendChild(note);
             }
 
@@ -411,13 +442,13 @@ var ZotDupeMergePreview = {
         }
 
         // Check if special row values differ
-        if (label === 'Tags' || label === 'Colectii') {
+        if (label === 'Tags' || label === 'Collections') {
             // Show union note on master cell
             var masterCell = tr.children[1]; // first value cell
             if (masterCell) {
                 var unionNote = document.createElement('span');
                 unionNote.className = 'union-note';
-                unionNote.textContent = '(rezultat: uniune)';
+                unionNote.textContent = '(result: union)';
                 masterCell.appendChild(unionNote);
             }
         }
@@ -426,9 +457,48 @@ var ZotDupeMergePreview = {
     },
 
     // ===========================================================
+    // onToggleInclude — checkbox in column header toggles item inclusion
+    // ===========================================================
+    onToggleInclude: function (itemId, included) {
+        if (included) {
+            this.excludedIds.delete(itemId);
+        } else {
+            this.excludedIds.add(itemId);
+            // Clear any field selections pointing to this item
+            for (var fn in this.fieldSelections) {
+                if (this.fieldSelections.hasOwnProperty(fn) &&
+                    String(this.fieldSelections[fn]) === String(itemId)) {
+                    delete this.fieldSelections[fn];
+                }
+            }
+        }
+        this.renderFieldTable();
+        this.renderWarnings();
+        this._updateMergeButton();
+    },
+
+    /**
+     * Update the merge button label to reflect how many items will be merged.
+     */
+    _updateMergeButton: function () {
+        var btn = document.getElementById('merge-btn-execute');
+        if (!btn) return;
+        var includedCount = this.allItems.length - this.excludedIds.size;
+        if (includedCount < 2) {
+            btn.disabled = true;
+            btn.textContent = 'Need at least 2 items';
+        } else {
+            btn.disabled = false;
+            btn.textContent = 'Execute merge (' + includedCount + ' items)';
+        }
+    },
+
+    // ===========================================================
     // onFieldSelect — user clicks to select which value to keep
     // ===========================================================
     onFieldSelect: function (fieldName, itemId) {
+        // Don't allow selecting from excluded items
+        if (this.excludedIds.has(itemId)) return;
         this.fieldSelections[fieldName] = itemId;
         // Re-render the table to update visual state
         this.renderFieldTable();
@@ -468,12 +538,12 @@ var ZotDupeMergePreview = {
             var warnDiv = document.createElement('div');
             warnDiv.className = 'merge-warning';
 
-            var text = 'Atentie: Itemul ' + (i + 1) + ' (' + dup.itemType + ') ' +
-                       'va fi schimbat la tipul \'' + masterType + '\' inainte de merge.';
+            var text = 'Warning: Item ' + (i + 1) + ' (' + dup.itemType + ') ' +
+                       'will be changed to type \'' + masterType + '\' before merge.';
 
             if (lostNames.length > 0) {
-                text += ' Campurile \'' + lostNames.join('\' si \'') +
-                        '\' vor fi salvate in campul Extra.';
+                text += ' Fields \'' + lostNames.join('\' and \'') +
+                        '\' will be saved in the Extra field.';
             }
 
             warnDiv.textContent = text;
@@ -488,7 +558,8 @@ var ZotDupeMergePreview = {
         if (window.arguments && window.arguments[0]) {
             window.arguments[0].result = {
                 merged: true,
-                fieldSelections: this.fieldSelections
+                fieldSelections: this.fieldSelections,
+                excludedIds: Array.from(this.excludedIds)
             };
         }
         window.close();
@@ -531,7 +602,7 @@ var ZotDupeMergePreview = {
      * Format tags array as HTML string with tag badges.
      */
     _formatTags: function (tags) {
-        if (!tags || tags.length === 0) return '<span class="empty-value">(fara)</span>';
+        if (!tags || tags.length === 0) return '<span class="empty-value">(none)</span>';
         var html = '';
         for (var i = 0; i < tags.length; i++) {
             html += '<span class="tag-item">' + this._escapeHtml(tags[i].tag || tags[i]) + '</span>';
@@ -543,17 +614,17 @@ var ZotDupeMergePreview = {
      * Format attachments list.
      */
     _formatAttachments: function (item) {
-        if (!item) return '<span class="empty-value">(fara)</span>';
+        if (!item) return '<span class="empty-value">(none)</span>';
         var attachments = item.attachments;
         if (!attachments || attachments.length === 0) {
             if (item.hasPDF) return '<span class="attachment-item">PDF</span>';
-            if (item.attachmentCount) return '<span class="attachment-item">' + item.attachmentCount + ' atasament(e)</span>';
-            return '<span class="empty-value">(fara)</span>';
+            if (item.attachmentCount) return '<span class="attachment-item">' + item.attachmentCount + ' attachment(s)</span>';
+            return '<span class="empty-value">(none)</span>';
         }
         var html = '';
         for (var i = 0; i < attachments.length; i++) {
             var att = attachments[i];
-            var name = (typeof att === 'string') ? att : (att.title || att.filename || 'atasament');
+            var name = (typeof att === 'string') ? att : (att.title || att.filename || 'attachment');
             html += '<span class="attachment-item">' + this._escapeHtml(name) + '</span>';
         }
         return html;
@@ -563,10 +634,10 @@ var ZotDupeMergePreview = {
      * Format collections list.
      */
     _formatCollections: function (item) {
-        if (!item) return '<span class="empty-value">(fara)</span>';
+        if (!item) return '<span class="empty-value">(none)</span>';
         var collections = item.collections;
         if (!collections || collections.length === 0) {
-            return '<span class="empty-value">(fara)</span>';
+            return '<span class="empty-value">(none)</span>';
         }
         var html = '';
         for (var i = 0; i < collections.length; i++) {

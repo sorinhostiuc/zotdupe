@@ -32,8 +32,8 @@ ZotDupe.Scanner.scoreLayer1 = function (a, b) {
     var hasSomething = false;
 
     // DOI
-    var doiA = __N.normalizeDOI(a.DOI);
-    var doiB = __N.normalizeDOI(b.DOI);
+    var doiA = _N.normalizeDOI(a.DOI);
+    var doiB = _N.normalizeDOI(b.DOI);
     if (doiA && doiB) {
         hasSomething = true;
         if (doiA === doiB) return 1.0;
@@ -56,8 +56,8 @@ ZotDupe.Scanner.scoreLayer1 = function (a, b) {
     }
 
     // ISBN
-    var isbnA = __N.normalizeISBN(a.ISBN);
-    var isbnB = __N.normalizeISBN(b.ISBN);
+    var isbnA = _N.normalizeISBN(a.ISBN);
+    var isbnB = _N.normalizeISBN(b.ISBN);
     if (isbnA && isbnB) {
         hasSomething = true;
         if (isbnA === isbnB) return 1.0;
@@ -294,23 +294,23 @@ ZotDupe.Scanner.scanPair = function (itemA, itemB, options) {
         var doiA = _N.normalizeDOI(itemA.DOI);
         var doiB = _N.normalizeDOI(itemB.DOI);
         if (doiA && doiB && doiA === doiB) {
-            matchType = 'DOI identic';
+            matchType = 'Identical DOI';
         } else {
             var isbnA = _N.normalizeISBN(itemA.ISBN);
             var isbnB = _N.normalizeISBN(itemB.ISBN);
             var pmidA = (itemA.PMID || '').trim();
             var pmidB = (itemB.PMID || '').trim();
             if (pmidA && pmidB && pmidA === pmidB) {
-                matchType = 'PMID identic';
+                matchType = 'Identical PMID';
             } else if (isbnA && isbnB && isbnA === isbnB) {
-                matchType = 'ISBN identic';
+                matchType = 'Identical ISBN';
             } else {
                 var pmcidA = (itemA.PMCID || '').trim();
                 var pmcidB = (itemB.PMCID || '').trim();
                 if (pmcidA && pmcidB && pmcidA === pmcidB) {
-                    matchType = 'PMID identic';
+                    matchType = 'Identical PMCID';
                 } else {
-                    matchType = 'DOI identic';
+                    matchType = 'Identical DOI';
                 }
             }
         }
@@ -318,29 +318,29 @@ ZotDupe.Scanner.scanPair = function (itemA, itemB, options) {
 
     if (scores.layer2 !== null && scores.layer2 > bestScore) {
         bestScore = scores.layer2;
-        matchType = 'Titlu similar + an';
+        matchType = 'Similar title + year';
     }
 
     // Layer 3 is never primary
 
     if (scores.layer4 !== null && scores.layer4 > bestScore) {
         bestScore = scores.layer4;
-        matchType = 'Fingerprint legislativ';
+        matchType = 'Legal fingerprint';
     }
 
     if (scores.layer5 !== null && scores.layer5 > bestScore) {
         bestScore = scores.layer5;
-        matchType = 'URL identic';
+        matchType = 'Identical URL';
     }
 
     if (scores.layer6 !== null && scores.layer6 > bestScore) {
         bestScore = scores.layer6;
-        matchType = 'Preprint ↔ articol';
+        matchType = 'Preprint ↔ article';
     }
 
     if (scores.layer7 !== null && scores.layer7 > bestScore) {
         bestScore = scores.layer7;
-        matchType = 'Posibilă traducere';
+        matchType = 'Possible translation';
     }
 
     return {

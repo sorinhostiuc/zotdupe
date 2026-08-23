@@ -2,7 +2,7 @@
 <?xml-stylesheet href="report-dialog.css" type="text/css"?>
 <window xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
         xmlns:html="http://www.w3.org/1999/xhtml"
-        title="ZotDupe — Raport"
+        title="ZotDupe — Report"
         width="560" height="500"
         onload="ZotDupeReport.init();">
 
@@ -17,7 +17,7 @@
                          stroke-linecap="round" stroke-linejoin="round"/>
         </html:svg>
       </html:div>
-      <html:span id="zotdupe-report-title">Scanare completată</html:span>
+      <html:span id="zotdupe-report-title">Scan Complete</html:span>
     </html:div>
 
     <!-- Summary card -->
@@ -25,11 +25,11 @@
 
       <!-- Scan stats -->
       <html:div class="zotdupe-report-row">
-        <html:span class="zotdupe-report-label">Itemi scanați</html:span>
+        <html:span class="zotdupe-report-label">Items scanned</html:span>
         <html:span class="zotdupe-report-value" id="zotdupe-stat-scanned">0</html:span>
       </html:div>
       <html:div class="zotdupe-report-row">
-        <html:span class="zotdupe-report-label">Clustere detectate</html:span>
+        <html:span class="zotdupe-report-label">Clusters detected</html:span>
         <html:span class="zotdupe-report-value" id="zotdupe-stat-clusters">0</html:span>
       </html:div>
 
@@ -37,15 +37,15 @@
 
       <!-- Merge stats -->
       <html:div class="zotdupe-report-row">
-        <html:span class="zotdupe-report-label">Merge-uri executate</html:span>
+        <html:span class="zotdupe-report-label">Merges performed</html:span>
         <html:span class="zotdupe-report-value zotdupe-val-green" id="zotdupe-stat-merges">0</html:span>
       </html:div>
       <html:div class="zotdupe-report-row">
-        <html:span class="zotdupe-report-label">Marcate ca non-duplicate</html:span>
+        <html:span class="zotdupe-report-label">Marked as non-duplicate</html:span>
         <html:span class="zotdupe-report-value zotdupe-val-gray" id="zotdupe-stat-nondup">0</html:span>
       </html:div>
       <html:div class="zotdupe-report-row">
-        <html:span class="zotdupe-report-label">Nerezolvate (skip)</html:span>
+        <html:span class="zotdupe-report-label">Unresolved (skipped)</html:span>
         <html:span class="zotdupe-report-value zotdupe-val-amber" id="zotdupe-stat-skipped">0</html:span>
       </html:div>
 
@@ -53,27 +53,27 @@
 
       <!-- Preservation stats -->
       <html:div class="zotdupe-report-row">
-        <html:span class="zotdupe-report-label">Câmpuri salvate în Extra</html:span>
+        <html:span class="zotdupe-report-label">Fields saved in Extra</html:span>
         <html:span class="zotdupe-report-value zotdupe-val-blue" id="zotdupe-stat-extra">0</html:span>
       </html:div>
       <html:div class="zotdupe-report-row">
-        <html:span class="zotdupe-report-label">Atașamente păstrate</html:span>
+        <html:span class="zotdupe-report-label">Attachments preserved</html:span>
         <html:span class="zotdupe-report-value" id="zotdupe-stat-attachments">0</html:span>
       </html:div>
       <html:div class="zotdupe-report-row">
-        <html:span class="zotdupe-report-label">Tags reunite</html:span>
-        <html:span class="zotdupe-report-value" id="zotdupe-stat-tags">0 tag-uri unice</html:span>
+        <html:span class="zotdupe-report-label">Tags merged</html:span>
+        <html:span class="zotdupe-report-value" id="zotdupe-stat-tags">0 unique tags</html:span>
       </html:div>
 
       <html:hr class="zotdupe-report-sep"/>
 
       <!-- Timing -->
       <html:div class="zotdupe-report-row">
-        <html:span class="zotdupe-report-label">Timp scanare</html:span>
+        <html:span class="zotdupe-report-label">Scan time</html:span>
         <html:span class="zotdupe-report-value" id="zotdupe-stat-scantime">0.0s</html:span>
       </html:div>
       <html:div class="zotdupe-report-row">
-        <html:span class="zotdupe-report-label">Timp merge total</html:span>
+        <html:span class="zotdupe-report-label">Total merge time</html:span>
         <html:span class="zotdupe-report-value" id="zotdupe-stat-mergetime">0.0s</html:span>
       </html:div>
 
@@ -81,8 +81,8 @@
 
     <!-- Footer buttons -->
     <html:div id="zotdupe-report-footer">
-      <html:button id="zotdupe-btn-export" onclick="ZotDupeReport.onExportCSV();">Exportă raport CSV</html:button>
-      <html:button id="zotdupe-btn-close" onclick="ZotDupeReport.onClose();">Închide</html:button>
+      <html:button id="zotdupe-btn-export" onclick="ZotDupeReport.onExportCSV();">Export CSV report</html:button>
+      <html:button id="zotdupe-btn-close" onclick="ZotDupeReport.onClose();">Close</html:button>
     </html:div>
 
   </html:div>

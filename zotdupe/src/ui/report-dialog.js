@@ -11,7 +11,9 @@
  *     scanTime, mergeTime }
  */
 
-/* globals Components, IOUtils, ZotDupe */
+var _io = window.arguments ? window.arguments[0] : null;
+var Zotero = _io ? _io.Zotero : (typeof Zotero !== 'undefined' ? Zotero : null);
+var ZotDupe = _io ? _io.ZotDupe : (typeof ZotDupe !== 'undefined' ? ZotDupe : null);
 
 var ZotDupeReport = {
   data: null,
@@ -35,7 +37,7 @@ var ZotDupeReport = {
     this._setText("zotdupe-stat-extra", this._num(s.extraFields));
     this._setText("zotdupe-stat-attachments", this._num(s.attachments));
     this._setText("zotdupe-stat-tags",
-      this._num(s.uniqueTags) + " tag-uri unice");
+      this._num(s.uniqueTags) + " unique tags");
     this._setText("zotdupe-stat-scantime", this._time(s.scanTime));
     this._setText("zotdupe-stat-mergetime", this._time(s.mergeTime));
   },
@@ -46,7 +48,7 @@ var ZotDupeReport = {
   async onExportCSV() {
     var fp = Components.classes["@mozilla.org/filepicker;1"]
       .createInstance(Components.interfaces.nsIFilePicker);
-    fp.init(window, "Salvează raport CSV", fp.modeSave);
+    fp.init(window, "Save CSV report", fp.modeSave);
     fp.appendFilter("CSV", "*.csv");
     fp.defaultString = "zotdupe-report.csv";
     fp.defaultExtension = "csv";

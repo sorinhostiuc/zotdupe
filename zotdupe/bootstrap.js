@@ -3,20 +3,27 @@
  * Bootstrap entry point.
  */
 
-var chromeHandle;
 var ZotDupe;
+var chromeHandle;
 
 function install(data, reason) {}
 
-function uninstall(data, reason) {}
-
-async function startup({ id, version, resourceURI, rootURI }, reason) {
+function startup({ id, version, resourceURI, rootURI }, reason) {
   // Fallback for older Zotero builds
   if (!rootURI) {
     rootURI = resourceURI.spec;
   }
 
-  await Zotero.initializationPromise;
+  // Register chrome://zotdupe/content/ -> src/
+  var aomStartup = Cc["@mozilla.org/addons/addon-manager-startup;1"]
+    .getService(Ci.amIAddonManagerStartup);
+  var manifestURI = Services.io.newURI(rootURI + "manifest.json");
+  chromeHandle = aomStartup.registerChrome(manifestURI, [
+    ["content", "zotdupe", rootURI + "src/"],
+  ]);
+
+  // Initialize global namespace
+  ZotDupe = {};
 
   // Set default preferences
   var branch = Services.prefs.getDefaultBranch("extensions.zotdupe.");
@@ -27,18 +34,6 @@ async function startup({ id, version, resourceURI, rootURI }, reason) {
   branch.setBoolPref("enableCrossType", true);
   branch.setBoolPref("enableMinHash", false);
   branch.setCharPref("excludedPairs", "[]");
-
-  // Register chrome mapping: chrome://zotdupe/content/ -> src/
-  var aomStartup = Components.classes[
-    "@mozilla.org/addons/addon-manager-startup;1"
-  ].getService(Components.interfaces.amIAddonManagerStartup);
-  var manifestURI = Services.io.newURI(rootURI + "manifest.json");
-  chromeHandle = aomStartup.registerChrome(manifestURI, [
-    ["content", "zotdupe", rootURI + "src/"],
-  ]);
-
-  // Initialize global namespace
-  ZotDupe = {};
 
   // Load modules in dependency order
   Services.scriptloader.loadSubScript(rootURI + "src/utils/normalize.js");
@@ -53,7 +48,7 @@ async function startup({ id, version, resourceURI, rootURI }, reason) {
 
   // Register preference pane
   Zotero.PreferencePanes.register({
-    pluginID: "zotdupe@zotero-plugins.org",
+    pluginID: "zotdupe@hostiuc.com",
     src: rootURI + "prefs.xhtml",
     label: "ZotDupe",
     image: rootURI + "icons/zotdupe.svg",
@@ -71,12 +66,13 @@ function onMainWindowLoad({ window }, reason) {
 
   var menuItem = doc.createXULElement("menuitem");
   menuItem.id = "zotdupe-scan-menuitem";
-  menuItem.setAttribute("label", "ZotDupe: Scan for Duplicates…");
+  menuItem.setAttribute("label", "ZotDupe: Scan for Duplicates\u2026");
   menuItem.addEventListener("command", function () {
     window.openDialog(
       "chrome://zotdupe/content/ui/config-dialog.xhtml",
       "zotdupe-config",
-      "chrome,centerscreen,resizable"
+      "chrome,centerscreen,resizable",
+      { Zotero: Zotero, ZotDupe: ZotDupe }
     );
   });
 
@@ -95,9 +91,7 @@ function onMainWindowUnload({ window }, reason) {
 }
 
 function shutdown({ id, version, resourceURI, rootURI }, reason) {
-  if (reason === APP_SHUTDOWN) {
-    return;
-  }
+  if (reason === APP_SHUTDOWN) return;
 
   var windows = Zotero.getMainWindows();
   for (var win of windows) {

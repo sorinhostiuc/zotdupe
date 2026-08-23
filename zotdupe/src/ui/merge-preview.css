@@ -213,6 +213,29 @@ td.cell-selected {
     margin-top: 2px;
 }
 
+/* ── Excluded column styling ── */
+.col-excluded {
+    background: #F5F5F5 !important;
+    color: #BBB !important;
+}
+
+td.cell-excluded {
+    opacity: 0.35;
+    pointer-events: none;
+    background: #F5F5F5 !important;
+}
+
+.col-include-cb {
+    cursor: pointer;
+    accent-color: #5C6BC0;
+    vertical-align: middle;
+    margin-right: 2px;
+}
+
+.col-header-text {
+    vertical-align: middle;
+}
+
 .empty-value {
     color: #CCC;
     font-style: italic;

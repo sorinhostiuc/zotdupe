@@ -8,12 +8,16 @@
  * threshold slider, advanced options, and scan initiation.
  */
 
+var _io = window.arguments ? window.arguments[0] : null;
+var Zotero = _io ? _io.Zotero : (typeof Zotero !== 'undefined' ? Zotero : null);
+var ZotDupe = _io ? _io.ZotDupe : (typeof ZotDupe !== 'undefined' ? ZotDupe : null);
+
 var ZotDupeConfigDialog = {
   /** Threshold presets mapping slider position to numeric value and label */
   _thresholds: [
-    { value: 0.90, name: "Strict",   desc: "Va detecta doar duplicatele foarte sigure." },
-    { value: 0.75, name: "Balansat", desc: "Va detecta duplicate probabile și sigure." },
-    { value: 0.60, name: "Relaxat", desc: "Va detecta și potriviri parțiale — mai multe rezultate, posibil zgomot." },
+    { value: 0.90, name: "Strict",   desc: "Will detect very sure duplicates only." },
+    { value: 0.75, name: "Balanced", desc: "Will detect probable and sure duplicates." },
+    { value: 0.60, name: "Relaxed", desc: "Will also detect partial matches — more results, possible noise." },
   ],
 
   /** Pref branch for ZotDupe settings */
@@ -21,6 +25,9 @@ var ZotDupeConfigDialog = {
 
   /** Cached collection list */
   _collections: [],
+
+  /** Currently selected collection ID */
+  _selectedCollectionID: null,
 
   /** Item count in the library */
   _itemCount: 0,
@@ -44,16 +51,35 @@ var ZotDupeConfigDialog = {
    * Populate the collection dropdown with user library collections.
    */
   async _populateCollections() {
-    var select = document.getElementById("zotdupe-collection-select");
     var libID = Zotero.Libraries.userLibraryID;
     var collections = await Zotero.Collections.getByLibrary(libID);
     this._collections = collections;
+  },
 
-    for (var col of collections) {
-      var opt = document.createElementNS("http://www.w3.org/1999/xhtml", "option");
-      opt.value = col.id;
-      opt.textContent = col.name;
-      select.appendChild(opt);
+  onPickCollection() {
+    if (!this._collections || this._collections.length === 0) return;
+
+    var labels = [];
+    var selectedIdx = { value: 0 };
+    for (var i = 0; i < this._collections.length; i++) {
+      labels.push(this._collections[i].name);
+      if (this._selectedCollectionID && this._collections[i].id === this._selectedCollectionID) {
+        selectedIdx.value = i;
+      }
+    }
+
+    var ps = typeof Services !== 'undefined' && Services.prompt
+        ? Services.prompt
+        : Components.classes['@mozilla.org/embedcomp/prompt-service;1']
+            .getService(Components.interfaces.nsIPromptService);
+
+    var ok = ps.select(window, 'ZotDupe', 'Select collection:', labels, selectedIdx);
+    if (ok) {
+      var col = this._collections[selectedIdx.value];
+      this._selectedCollectionID = col.id;
+      var btn = document.getElementById("zotdupe-collection-btn");
+      btn.textContent = col.name;
+      this._updateEstimate();
     }
   },
 
@@ -110,8 +136,8 @@ var ZotDupeConfigDialog = {
         break;
       }
     }
-    var select = document.getElementById("zotdupe-collection-select");
-    select.disabled = !isCollection;
+    var btn = document.getElementById("zotdupe-collection-btn");
+    btn.disabled = !isCollection;
     this._updateEstimate();
   },
 
@@ -123,7 +149,7 @@ var ZotDupeConfigDialog = {
     var idx = parseInt(value, 10);
     var t = this._thresholds[idx];
     var desc = document.getElementById("zotdupe-threshold-desc");
-    desc.textContent = "Pragul curent: \u2265 " + t.value.toFixed(2) + " — " + t.desc;
+    desc.textContent = "Current threshold: \u2265 " + t.value.toFixed(2) + " — " + t.desc;
   },
 
   /**
@@ -160,15 +186,15 @@ var ZotDupeConfigDialog = {
 
     var est;
     if (count < 100) {
-      est = "< 1 secundă";
+      est = "< 1 second";
     } else if (count < 500) {
-      est = "câteva secunde";
+      est = "a few seconds";
     } else if (count < 2000) {
-      est = "~10–30 secunde";
+      est = "~10–30 seconds";
     } else if (count < 10000) {
-      est = "~1–3 minute";
+      est = "~1–3 minutes";
     } else {
-      est = "câteva minute (bibliotecă mare)";
+      est = "a few minutes (large library)";
     }
 
     document.getElementById("zotdupe-estimate-text").textContent = est;
@@ -190,12 +216,11 @@ var ZotDupeConfigDialog = {
 
     var collectionID = null;
     if (scope === "collection") {
-      var select = document.getElementById("zotdupe-collection-select");
-      collectionID = select.value ? parseInt(select.value, 10) : null;
+      collectionID = this._selectedCollectionID;
       if (!collectionID) {
-        // No collection selected — flash the dropdown
-        select.style.outline = "2px solid #e53935";
-        setTimeout(function () { select.style.outline = ""; }, 1500);
+        var btn = document.getElementById("zotdupe-collection-btn");
+        btn.style.outline = "2px solid #e53935";
+        setTimeout(function () { btn.style.outline = ""; }, 1500);
         return;
       }
     }
@@ -254,6 +279,8 @@ var ZotDupeConfigDialog = {
 
       // Build config object to pass to the results panel
       var config = {
+        Zotero: Zotero,
+        ZotDupe: ZotDupe,
         scope: scope,
         collectionID: collectionID,
         threshold: thresholdValue,
@@ -291,7 +318,7 @@ var ZotDupeConfigDialog = {
     document.getElementById("zotdupe-btn-cancel").disabled = true;
     // Reset bar
     document.getElementById("zotdupe-progress-bar-fill").style.width = "0%";
-    document.getElementById("zotdupe-progress-status").textContent = "Se scanează...";
+    document.getElementById("zotdupe-progress-status").textContent = "Scanning...";
   },
 
   /**
@@ -326,3 +353,7 @@ var ZotDupeConfigDialog = {
     window.close();
   },
 };
+
+window.addEventListener("load", function () {
+  ZotDupeConfigDialog.init();
+});
