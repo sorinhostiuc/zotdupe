@@ -4,8 +4,8 @@
       "updates": [
         {
           "version": "2.4.1",
-          "update_link": "https://github.com/sorinhostiuc/zotdupe/releases/download/v2.4.1/zotdupe-2.4.1.xpi",
-          "update_hash": "sha256:9ba9005f61e5493793463860913bf7083e8e73cc565b728dceb471ab88201737",
+          "update_link": "https://github.com/sorinhostiuc/zotdupe/releases/download/v2.4.2/zotdupe-2.4.1.xpi",
+          "update_hash": "sha256:758d4541a736c9685fa2d195df8ac06bc20ee1378d33fb5f41ebb9a6f4ac373d",
           "applications": {
             "zotero": {
               "strict_min_version": "6.999",
