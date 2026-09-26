@@ -3,9 +3,9 @@
     "zotdupe@hostiuc.com": {
       "updates": [
         {
-          "version": "2.4.1",
-          "update_link": "https://github.com/sorinhostiuc/zotdupe/releases/download/v2.4.2/zotdupe-2.4.1.xpi",
-          "update_hash": "sha256:758d4541a736c9685fa2d195df8ac06bc20ee1378d33fb5f41ebb9a6f4ac373d",
+          "version": "2.4.2",
+          "update_link": "https://github.com/sorinhostiuc/zotdupe/releases/download/v2.4.2/zotdupe-2.4.2.xpi",
+          "update_hash": "sha256:ac8328d367bb8d37b24035119ba2e15d5102f6e8dca3cf36da516a4b1c80b839",
           "applications": {
             "zotero": {
               "strict_min_version": "6.999",
