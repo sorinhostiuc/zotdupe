@@ -23,7 +23,7 @@ ZotDupe groups likely duplicates for review. You choose the master item before m
 2. In Zotero, open **Tools > Plugins**.
 3. Choose **Install Plugin From File**, select the `.xpi`, and restart Zotero if asked.
 
-ZotDupe supports Zotero 7 through 9.
+ZotDupe supports Zotero 7 and later (including Zotero 10 and beyond).
 
 ## Development
 
